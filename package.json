@@ -1,12 +1,11 @@
 {
-  "name": "restbase",
-  "version": "0.10.0",
-  "description": "REST storage and service dispatcher",
-  "main": "lib/server.js",
+  "name": "hyperswitch",
+  "version": "0.1.0",
+  "description": "REST API creation framework",
+  "main": "index.js",
   "scripts": {
-    "start": "service-runner",
-    "test": "sh test/utils/run_tests.sh test",
-    "coverage": "sh test/utils/run_tests.sh coverage",
+    "test": "mocha",
+    "coverage": "istanbul cover _mocha -- -R spec",
     "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
@@ -16,21 +15,14 @@
   "keywords": [
     "REST",
     "API",
-    "routing",
-    "orchestration",
-    "storage",
-    "buckets",
-    "tables",
-    "queues",
-    "cassandra",
-    "kafka"
+    "routing"
   ],
   "author": "Wikimedia Service Team <services@wikimedia.org>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://phabricator.wikimedia.org/tag/restbase/"
+    "url": "https://phabricator.wikimedia.org/tag/hyperswitch/"
   },
-  "homepage": "https://github.com/wikimedia/restbase",
+  "homepage": "https://github.com/wikimedia/hyperswitch",
   "dependencies": {
     "core-js": "^2.0.3",
     "bluebird": "^3.1.1",
@@ -39,14 +31,10 @@
     "jsonwebtoken": "^5.5.4",
     "cassandra-uuid": "^0.0.2",
     "preq": "^0.4.8",
-    "restbase-mod-table-cassandra": "^0.8.15",
-    "service-runner": "^1.1.0",
     "swagger-router": "^0.3.4",
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
     "json-stable-stringify": "git+https://github.com/wikimedia/json-stable-stringify#master",
-    "htcp-purge": "^0.1.2",
-    "ajv": "^3.4.0",
-    "content-type": "git+https://github.com/wikimedia/content-type#master"
+    "ajv": "^3.4.0"
   },
   "devDependencies": {
     "bunyan": "^1.5.1",
@@ -57,16 +45,6 @@
     "mocha-jshint": "^2.2.6",
     "mocha-lcov-reporter": "^1.0.0",
     "nock": "^5.2.1",
-    "restbase-mod-table-sqlite": "^0.1.14",
-    "swagger-test": "0.3.0",
-    "url-template": "^2.0.6",
-    "temp": "^0.8.3"
-  },
-  "deploy": {
-    "node": "4.2",
-    "target": "debian",
-    "dependencies": {
-      "_all": []
-    }
+    "service-runner": "^1.1.0"
   }
 }

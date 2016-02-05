@@ -1,6 +1,6 @@
 {
   "name": "hyperswitch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "REST API creation framework",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/wikimedia/restbase.git"
+    "url": "git://github.com/wikimedia/hyperswitch.git"
   },
   "keywords": [
     "REST",

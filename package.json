@@ -28,7 +28,6 @@
     "bluebird": "^3.1.1",
     "busboy": "^0.2.12",
     "js-yaml": "^3.5.2",
-    "jsonwebtoken": "^5.5.4",
     "cassandra-uuid": "^0.0.2",
     "preq": "^0.4.8",
     "swagger-router": "^0.3.4",

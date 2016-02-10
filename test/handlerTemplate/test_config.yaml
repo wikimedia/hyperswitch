@@ -120,7 +120,6 @@ services:
     conf:
       port: 12345
       spec: *spec_root
-      salt: secret
       default_page_size: 1
       user_agent: HyperSwitch-testsuite
 

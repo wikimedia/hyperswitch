@@ -103,5 +103,17 @@ describe('HyperSwitch context', function() {
         });
     });
 
+    it('Should strip out hop-to-hop headers', function() {
+        return preq.get({
+            uri: server.hostPort + '/service/hop_to_hop'
+        })
+        .then(function(res) {
+            assert.deepEqual(res.status, 200);
+            assert.deepEqual(res.headers.hasOwnProperty('transfer-encoding'), false);
+            assert.deepEqual(res.headers.hasOwnProperty('public'), false);
+            assert.deepEqual(res.headers.hasOwnProperty('content-encoding'), false);
+        });
+    });
+
     after(function() { return server.stop(); });
 });

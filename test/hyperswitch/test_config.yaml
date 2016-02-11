@@ -57,6 +57,18 @@ spec_root: &spec_root
                 body: 'abcdef'
         x-monitor: false
 
+    /service/hop_to_hop:
+      get:
+        x-request-handler:
+          - return_result:
+              return:
+                status: 200
+                headers:
+                  transfer-encoding: chunked
+                  public: GET
+                  content-encoding: gzip
+                body: 'test'
+
 
 # Finally, a standard service-runner config.
 info:

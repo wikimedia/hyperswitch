@@ -7,30 +7,33 @@ var Router = require('../../lib/router');
 var assert = require('../utils/assert');
 var fs     = require('fs');
 var yaml   = require('js-yaml');
+var URI    = require('swagger-router').URI;
 
 var fakeHyperSwitch = { config: {} };
 
-// x-subspec and x-subspecs is no longer supported.
-var faultySpec = {
-    paths: {
-        '/{domain:en.wikipedia.org}': {
-            'x-subspecs': [],
-            'x-subspec': {}
+var noopResponseHanlder = {
+    'x-request-hander': [
+        {
+            return_something: {
+                'return': {
+                    status: 200
+                }
+            }
         }
-    }
+    ]
 };
 
 var additionalMethodSpec = {
     paths: {
         '/{domain:en.wikipedia.org}/v1': {
-            'x-modules': {
-                '/': [{
+            'x-modules': [
+                {
                     path: 'test/router/subspec1.yaml'
                 },
                     {
                         path: 'test/router/subspec2.yaml'
-                    }]
-            }
+                    }
+            ]
         }
     }
 };
@@ -48,14 +51,14 @@ var noHandlerSpec = {
 var overlappingMethodSpec = {
     paths: {
         '/{domain:en.wikipedia.org}/v1': {
-            'x-modules': {
-                '/': [{
+            'x-modules': [
+                {
                     path: 'test/router/subspec1.yaml'
                 },
-                    {
-                        path: 'test/router/subspec1.yaml'
-                    }]
-            }
+                {
+                    path: 'test/router/subspec1.yaml'
+                }
+            ]
         }
     }
 };
@@ -64,31 +67,17 @@ var overlappingMethodSpec = {
 var nestedSecuritySpec = {
     paths: {
         '/{domain:en.wikipedia.org}/v1': {
-            'x-modules': {
-                '/': [{
+            'x-modules': [
+                {
                     path: 'test/router/secure_subspec.yaml'
-                }]
-            },
+                }
+            ],
             security: ['first']
         }
     }
 };
 
 describe('Router', function() {
-
-    it('should fail loading a faulty spec', function() {
-        var router = new Router({
-            appBasePath: __dirname + '/../..'
-        });
-        return router.loadSpec(faultySpec, fakeHyperSwitch)
-        .then(function() {
-            throw new Error("Should throw an exception!");
-        },
-        function(e) {
-            assert.deepEqual(e.message,
-            'x-subspec and x-subspecs is no longer supported! Use x-modules instead.');
-        });
-    });
 
     it('should allow adding methods to existing paths', function() {
         var router = new Router({
@@ -153,6 +142,197 @@ describe('Router', function() {
         .then(function() {
             var node = router.route('/test2');
             assert.deepEqual(node.value.path, '/test2');
+        });
+    });
+
+    it('support loading modules from absolute paths', function() {
+        var router = new Router({ appBasePath: __dirname + '/../..' });
+        return router.loadSpec({
+            paths: {
+                '/test': {
+                    'x-modules': [
+                        { path: __dirname + '/api_module_1.yaml'}
+                    ]
+                }
+            }
+        }, fakeHyperSwitch)
+    });
+
+    it('supports merging api specs from different modules', function() {
+        var router = new Router({ appBasePath: __dirname + '/../..' });
+        return router.loadSpec({
+            paths: {
+                '/test': {
+                    'x-modules': [
+                        { path: 'test/router/api_module_1.yaml'},
+                        { path: 'test/router/api_module_2.yaml'},
+                    ]
+                }
+            }
+        }, fakeHyperSwitch)
+        .then(function() {
+            var node = router.route('/test/api/');
+            assert.deepEqual(!!node, true);
+            assert.deepEqual(!!node.value, true);
+            assert.deepEqual(!!node.value.specRoot, true);
+            var spec = node.value.specRoot;
+            assert.deepEqual(spec.definitions, {
+                first_parameter: {description: 'First parameter definition'},
+                second_parameter: {description: 'Second parameter definition'}
+            });
+            assert.deepEqual(Object.keys(spec.paths), ['/one', '/two']);
+        });
+    });
+
+    it('supports exposing top-level spec', function() {
+        var router = new Router({
+            appBasePath: __dirname + '/../..'
+        });
+        return router.loadSpec(yaml.safeLoad(fs.readFileSync(__dirname + '/root_api_spec.yaml')), fakeHyperSwitch)
+        .then(function() {
+            var node = router.route('/');
+            assert.deepEqual(!!node, true);
+            assert.deepEqual(!!node.value, true);
+            assert.deepEqual(!!node.value.specRoot, true);
+            var spec = node.value.specRoot;
+            assert.deepEqual(spec.definitions, {
+                some_object: {description: 'bla bla bla'}
+            });
+            assert.deepEqual(Object.keys(spec.paths), ['/test']);
+        });
+    });
+
+    it('supports recursive matching with + modifier', function() {
+        var router = new Router({ appBasePath: __dirname + '/../..' });
+        return router.loadSpec({
+            paths: {
+                '/test/{+rest}': noopResponseHanlder
+            }
+        }, fakeHyperSwitch)
+        .then(function() {
+            var node = router.route('/test/foo/bar/baz');
+            assert.deepEqual(!!node, true);
+            assert.deepEqual(node.params.rest, 'foo/bar/baz');
+        });
+    });
+
+    it('supports optional matching', function() {
+        var router = new Router({ appBasePath: __dirname + '/../..' });
+        return router.loadSpec({
+            paths: {
+                '/test{/rest}': noopResponseHanlder
+            }
+        }, fakeHyperSwitch)
+        .then(function() {
+            var node = router.route('/test/foo');
+            assert.deepEqual(!!node, true);
+            assert.deepEqual(node.params.rest, 'foo');
+            node = router.route('/test');
+            assert.deepEqual(!!node, true);
+            assert.deepEqual(node.params.rest, undefined);
+        });
+    });
+
+    it('does not explode on empty spec', function() {
+        var router = new Router({ appBasePath: __dirname + '/../..' });
+        return router.loadSpec({
+            paths: { }
+        }, fakeHyperSwitch);
+    });
+
+    it('passes options to modules', function() {
+        var router = new Router({ appBasePath: __dirname + '/../..' });
+        // The error is thrown by options_testing_module in case options are not passed correctly
+        return router.loadSpec({
+            paths: {
+                '/test': {
+                    'x-modules': [
+                        {
+                            path: __dirname + '/options_testing_module.js',
+                            options: {
+                                simple_option: 'simple_option_value',
+                                templated_option: '{{options.test_conf_option}}',
+                                templates: {
+                                    sample_template: '{{should not be expanded}}'
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }, { config: {
+            test_conf_option: 'test_conf_option_value'
+        }})
+    });
+
+    it('calls resources when module is created', function(done) {
+        var router = new Router({ appBasePath: __dirname + '/../..' });
+        return router.loadSpec({
+            paths: {
+                '/test': {
+                    'x-modules': [
+                        {
+                            path: __dirname + '/module_with_resources.js',
+                        }
+                    ]
+                }
+            }
+        }, { config: {},
+            request: function(req) {
+                try {
+                    var expectedRequest = {
+                        method: 'post',
+                        uri: new URI('/testing/uri/that/will/be/checked/by/test'),
+                        headers: {
+                            test: 'test'
+                        },
+                        body: 'test'
+                    };
+                    assert.deepEqual(req, expectedRequest);
+                    done();
+                } catch (e) {
+                    done(e);
+                }
+            }
+        })
+    });
+
+    it('finds module with in app basePath node_modules', function() {
+        var router = new Router({ appBasePath: __dirname });
+        return router.loadSpec({
+            paths: {
+                '/test': {
+                    'x-modules': [
+                        {
+                            path: 'sample_module.js'
+                        }
+                    ]
+                }
+            }
+        }, { config: {} })
+        .then(function() {
+            assert.deepEqual(!!router.route('/test/temp'), true);
+        });
+    });
+
+    it('throws error if module is not found', function() {
+        var router = new Router({ appBasePath: __dirname });
+        return router.loadSpec({
+            paths: {
+                '/test': {
+                    'x-modules': [
+                        {
+                            path: 'not_existing_module.js'
+                        }
+                    ]
+                }
+            }
+        }, { config: {} })
+        .then(function() {
+            throw new Error('Error should be thrown');
+        }, function(e) {
+            assert.deepEqual(e.code, 'MODULE_NOT_FOUND');
+            assert.deepEqual(e.moduleName, 'not_existing_module.js');
         });
     });
 });

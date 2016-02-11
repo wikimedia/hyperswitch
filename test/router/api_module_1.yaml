@@ -1,0 +1,15 @@
+paths:
+  /{api:api}:
+    x-modules:
+      - spec:
+          definitions:
+            first_parameter:
+              description: First parameter definition
+          paths:
+            /one:
+              get:
+                x-request-handler:
+                  - return_nothing:
+                      return:
+                        status: 200
+

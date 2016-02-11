@@ -2,8 +2,7 @@ spec_root: &spec_root
   paths:
     /test:
       x-modules:
-        /:
-          - path: test/streaming/stream_module.js
+        - path: test/streaming/stream_module.js
 
 # Finally, a standard service-runner config.
 info:

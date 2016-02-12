@@ -57,6 +57,18 @@ spec_root: &spec_root
                 body: 'abcdef'
         x-monitor: false
 
+    /service/json_body:
+      post:
+        x-request-handler:
+          - get_from_api:
+              return:
+                status: 200
+                headers:
+                  content-type: 'application/json'
+                body:
+                  result: '{$.request.body.field}'
+        x-monitor: false
+
     /service/hop_to_hop:
       get:
         x-request-handler:

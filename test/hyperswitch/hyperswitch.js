@@ -4,6 +4,8 @@ var assert = require('../utils/assert.js');
 var Server = require('../utils/server.js');
 var preq   = require('preq');
 
+var main = require('../../lib/server');
+
 // mocha defines to avoid JSHint breakage
 /* global describe, it, before, beforeEach, after, afterEach */
 
@@ -101,6 +103,116 @@ describe('HyperSwitch context', function() {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.headers['content-length'], undefined);
         });
+    });
+
+    it('parses JSON content', function() {
+        // First try invalid JSON body
+        return preq.post({
+            uri: server.hostPort + '/service/json_body',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: '{"field": "wrong'
+        })
+        .then(function(res) {
+            assert.deepEqual(res.status, 200);
+            // Now try passing a valid json
+            return preq.post({
+                uri: server.hostPort + '/service/json_body',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: {
+                    field: 'value'
+                }
+            });
+        })
+        .then(function(res) {
+            assert.deepEqual(res.status, 200);
+            assert.deepEqual(res.body, { result: 'value' });
+        });
+    });
+
+    var simpleSpec = {
+        paths: {
+            '/test': {
+                get: {
+                    'x-request-handler': [
+                        {
+                            returnResult: {
+                                return: {
+                                    status: 200,
+                                    body: 'TEST'
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    };
+
+    it('does not explode if no logger and metrics provided', function() {
+        var options = {
+            appBasePath: __dirname + '/../../',
+            config: {
+                salt: 'test',
+                port: 12346,
+                spec: simpleSpec
+            }
+        };
+        return main(options)
+        .then(function(server) {
+            return preq.get({
+                uri: 'http://localhost:12346/test'
+            })
+            .then(function(res) {
+                assert.deepEqual(res.status, 200);
+                assert.deepEqual(res.body, 'TEST');
+                return preq.get({
+                    uri: 'http://localhost:12346/not_found'
+                })
+                .then(function() {
+                    throw new Error('Error should be thrown');
+                }, function(e) {
+                    assert.deepEqual(e.status, 404);
+                });
+            })
+            .finally(function() {
+                server.close();
+            });
+        });
+    });
+
+    it('requires salt in the config', function() {
+        try {
+            main({
+                appBasePath: __dirname + '/../../',
+                config: {
+                    port: 12346,
+                    spec: simpleSpec
+                }
+            });
+            throw new Error('Should throw error on invalid salt');
+        } catch (e) {
+            assert.deepEqual(e.message,
+                'Missing or invalid `salt` option in HyperSwitch config. Expected a string.')
+        }
+
+        try {
+            main({
+                appBasePath: __dirname + '/../../',
+                config: {
+                    salt: 1,
+                    port: 12346,
+                    spec: simpleSpec
+                }
+            });
+            throw new Error('Should throw error on invalid salt');
+        } catch (e) {
+            assert.deepEqual(e.message,
+            'Missing or invalid `salt` option in HyperSwitch config. Expected a string.')
+        }
     });
 
     it('Should strip out hop-to-hop headers', function() {

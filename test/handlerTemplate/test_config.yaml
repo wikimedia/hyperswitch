@@ -24,8 +24,8 @@ spec_root: &spec_root
                 headers:
                   'content-type': 'application/json'
                 body:
-                  res1: '{$.get_from_api1.body}'
-                  res2: '{$.get_from_api2.body}'
+                  res1: '{{get_from_api1.body}}'
+                  res2: '{{get_from_api2.body}}'
         x-monitor: false
     /service/return_if_test/{title}:
       get:
@@ -40,18 +40,18 @@ spec_root: &spec_root
                   - 404
                   - '3xx'
               return:
-                status: '{$.get_from_api.status}'
+                status: '{{get_from_api.status}}'
                 headers:
-                  'content-type': '{$.get_from_api.headers.content-type}'
-                body: '{$.get_from_api.body}'
+                  'content-type': '{{get_from_api.headers.content-type}}'
+                body: '{{get_from_api.body}}'
           - repeat_request:
               request:
                 uri: http://mocked_domain_for_tests.com/{title}
               return:
-                status: '{$.repeat_request.status}'
+                status: '{{repeat_request.status}}'
                 headers:
-                  'content-type': '{$.repeat_request.headers.content-type}'
-                body: '{$.repeat_request.body}'
+                  'content-type': '{{repeat_request.headers.content-type}}'
+                body: '{{repeat_request.body}}'
         x-monitor: false
 
     /service/simple_catch/{title}:
@@ -65,18 +65,18 @@ spec_root: &spec_root
               catch:
                 status: 404
               return:
-                status: '{$.get_from_api.status}'
+                status: '{{get_from_api.status}}'
                 headers:
-                  'content-type': '{$.get_from_api.headers.content-type}'
-                body: '{$.get_from_api.body}'
+                  'content-type': '{{get_from_api.headers.content-type}}'
+                body: '{{get_from_api.body}}'
           - repeat_request:
               request:
                 uri: http://mocked_domain_for_tests.com/{title}
               return:
-                status: '{$.repeat_request.status}'
+                status: '{{repeat_request.status}}'
                 headers:
-                  'content-type': '{$.repeat_request.headers.content-type}'
-                body: '{$.repeat_request.body}'
+                  'content-type': '{{repeat_request.headers.content-type}}'
+                body: '{{repeat_request.body}}'
         x-monitor: false
 
     /service/non_status_catch/{title}:
@@ -89,10 +89,10 @@ spec_root: &spec_root
                 body:
                   test: 'test'
               return:
-                status: '{$.get_from_api.status}'
+                status: '{{get_from_api.status}}'
                 headers:
-                  'content-type': '{$.get_from_api.headers.content-type}'
-                body: '{$.get_from_api.body}'
+                  'content-type': '{{get_from_api.headers.content-type}}'
+                body: '{{get_from_api.body}}'
         x-monitor: false
 
     /service/setup_test:

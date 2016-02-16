@@ -28,11 +28,11 @@ var additionalMethodSpec = {
         '/{domain:en.wikipedia.org}/v1': {
             'x-modules': [
                 {
-                    path: 'test/router/subspec1.yaml'
+                    path: 'subspec1.yaml'
                 },
-                    {
-                        path: 'test/router/subspec2.yaml'
-                    }
+                {
+                    path: 'subspec2.yaml'
+                }
             ]
         }
     }
@@ -53,10 +53,10 @@ var overlappingMethodSpec = {
         '/{domain:en.wikipedia.org}/v1': {
             'x-modules': [
                 {
-                    path: 'test/router/subspec1.yaml'
+                    path: 'subspec1.yaml'
                 },
                 {
-                    path: 'test/router/subspec1.yaml'
+                    path: 'subspec1.yaml'
                 }
             ]
         }
@@ -69,7 +69,7 @@ var nestedSecuritySpec = {
         '/{domain:en.wikipedia.org}/v1': {
             'x-modules': [
                 {
-                    path: 'test/router/secure_subspec.yaml'
+                    path: 'secure_subspec.yaml'
                 }
             ],
             security: ['first']
@@ -80,9 +80,7 @@ var nestedSecuritySpec = {
 describe('Router', function() {
 
     it('should allow adding methods to existing paths', function() {
-        var router = new Router({
-            appBasePath: __dirname + '/../..'
-        });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec(additionalMethodSpec, fakeHyperSwitch)
         .then(function() {
             var handler = router.route('/en.wikipedia.org/v1/page/Foo/html');
@@ -92,9 +90,7 @@ describe('Router', function() {
     });
 
     it('should error on overlapping methods on the same path', function() {
-        var router = new Router({
-            appBasePath: __dirname + '/../..'
-        });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec(overlappingMethodSpec, fakeHyperSwitch)
         .then(function() {
             throw new Error("Should throw an exception!");
@@ -105,9 +101,7 @@ describe('Router', function() {
     });
 
     it('should pass permission along the path to endpoint', function() {
-        var router = new Router({
-            appBasePath: __dirname + '/../..'
-        });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec(nestedSecuritySpec, fakeHyperSwitch)
         .then(function() {
             var handler = router.route('/en.wikipedia.org/v1/page/secure');
@@ -120,9 +114,7 @@ describe('Router', function() {
         });
     });
     it('should fail when no handler found for method', function() {
-        var router = new Router({
-            appBasePath: __dirname + '/../..'
-        });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec(noHandlerSpec, fakeHyperSwitch)
         .then(function() {
             throw new Error("Should throw an exception!");
@@ -135,9 +127,7 @@ describe('Router', function() {
 
     it('should not modify top-level spec-root', function() {
         var spec = yaml.safeLoad(fs.readFileSync(__dirname + '/multi_domain_spec.yaml'));
-        var router = new Router({
-            appBasePath: __dirname + '/../..'
-        });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec(spec, fakeHyperSwitch)
         .then(function() {
             var node = router.route('/test2');
@@ -146,7 +136,7 @@ describe('Router', function() {
     });
 
     it('support loading modules from absolute paths', function() {
-        var router = new Router({ appBasePath: __dirname + '/../..' });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec({
             paths: {
                 '/test': {
@@ -159,13 +149,13 @@ describe('Router', function() {
     });
 
     it('supports merging api specs from different modules', function() {
-        var router = new Router({ appBasePath: __dirname + '/../..' });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec({
             paths: {
                 '/test': {
                     'x-modules': [
-                        { path: 'test/router/api_module_1.yaml'},
-                        { path: 'test/router/api_module_2.yaml'},
+                        { path: 'api_module_1.yaml'},
+                        { path: 'api_module_2.yaml'},
                     ]
                 }
             }
@@ -185,9 +175,7 @@ describe('Router', function() {
     });
 
     it('supports exposing top-level spec', function() {
-        var router = new Router({
-            appBasePath: __dirname + '/../..'
-        });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec(yaml.safeLoad(fs.readFileSync(__dirname + '/root_api_spec.yaml')), fakeHyperSwitch)
         .then(function() {
             var node = router.route('/');
@@ -203,7 +191,7 @@ describe('Router', function() {
     });
 
     it('supports recursive matching with + modifier', function() {
-        var router = new Router({ appBasePath: __dirname + '/../..' });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec({
             paths: {
                 '/test/{+rest}': noopResponseHanlder
@@ -217,7 +205,7 @@ describe('Router', function() {
     });
 
     it('supports optional matching', function() {
-        var router = new Router({ appBasePath: __dirname + '/../..' });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec({
             paths: {
                 '/test{/rest}': noopResponseHanlder
@@ -234,14 +222,14 @@ describe('Router', function() {
     });
 
     it('does not explode on empty spec', function() {
-        var router = new Router({ appBasePath: __dirname + '/../..' });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec({
             paths: { }
         }, fakeHyperSwitch);
     });
 
     it('passes options to modules', function() {
-        var router = new Router({ appBasePath: __dirname + '/../..' });
+        var router = new Router({ appBasePath: __dirname });
         // The error is thrown by options_testing_module in case options are not passed correctly
         return router.loadSpec({
             paths: {
@@ -266,7 +254,7 @@ describe('Router', function() {
     });
 
     it('calls resources when module is created', function(done) {
-        var router = new Router({ appBasePath: __dirname + '/../..' });
+        var router = new Router({ appBasePath: __dirname });
         return router.loadSpec({
             paths: {
                 '/test': {

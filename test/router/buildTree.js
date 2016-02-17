@@ -323,4 +323,46 @@ describe('Router', function() {
             assert.deepEqual(e.moduleName, 'not_existing_module.js');
         });
     });
+
+    it('throws error on invalid modules definition', function() {
+        var router = new Router({ appBasePath: __dirname });
+        return router.loadSpec({
+            paths: {
+                '/test': {
+                    'x-modules': {
+                        path: 'not_existing_module.js'
+                    }
+                }
+            }
+        }, { config: {} })
+        .then(function() {
+            throw new Error('Error should be thrown');
+        }, function(e) {
+            assert.deepEqual(/^Invalid modules definition/.test(e.message), true);
+        });
+    });
+
+    it('supports multiple optional parameters', function() {
+        var router = new Router({ appBasePath: __dirname });
+        return router.loadSpec({
+            paths: {
+                '/test{/key1}{/key2}': {
+                    'get': {
+                        'x-request-handler': [
+                            { do_request: {
+                                    return: {
+                                        status: 200
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }, { config: {} })
+        .then(function() {
+            assert.deepEqual(router.route('/test/value1/value2').params,
+                { key1 : 'value1', key2: 'value2' });
+        });
+    });
 });

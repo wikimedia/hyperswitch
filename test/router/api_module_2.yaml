@@ -1,0 +1,14 @@
+paths:
+  /{api:api}:
+    x-modules:
+      - spec:
+          definitions:
+            second_parameter:
+              description: Second parameter definition
+          paths:
+            /two:
+              get:
+                x-request-handler:
+                  - return_nothing:
+                      return:
+                        status: 200

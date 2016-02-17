@@ -2,5 +2,4 @@ paths:
   /page:
     security: [second, third]
     x-modules:
-      /:
-        - path: test/router/really_secure_subspec.yaml
+      - path: really_secure_subspec.yaml

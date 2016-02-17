@@ -1,0 +1,10 @@
+definitions:
+  some_object:
+    description: 'bla bla bla'
+paths:
+  /test:
+    get:
+      x-request-hander:
+        - return_result:
+            return:
+              status: 200

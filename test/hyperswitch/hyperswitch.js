@@ -227,5 +227,16 @@ describe('HyperSwitch context', function() {
         });
     });
 
+    it('Should retrieve the if multi-api is not used', function() {
+        return preq.get({
+            uri: server.hostPort + '/?spec'
+        })
+        .then(function(res) {
+            assert.deepEqual(res.status, 200);
+            assert.contentType(res, 'application/json');
+            assert.deepEqual(res.body.swagger, '2.0');
+        });
+    });
+
     after(function() { return server.stop(); });
 });

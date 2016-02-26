@@ -26,5 +26,12 @@ function notDeepEqual(result, expected, message) {
     }
 }
 
+function contentType(res, expected) {
+    var actual = res.headers['content-type'];
+    deepEqual(actual, expected,
+        'Expected content-type to be ' + expected + ', but was ' + actual);
+}
+
 module.exports.deepEqual = deepEqual;
 module.exports.notDeepEqual = notDeepEqual;
+module.exports.contentType = contentType;

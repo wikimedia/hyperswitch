@@ -98,5 +98,20 @@ describe('Documentation handling', function() {
         });
     });
 
+    it('should disallow unsecure relative paths for static serve', function() {
+        return preq.get({
+            uri: server.hostPort + '/v1/?doc=&path=../../../Test',
+            headers: {
+                accept: 'text/html'
+            }
+        })
+        .then(function() {
+            throw new Error('Error should be thrown');
+        }, function(e) {
+            assert.deepEqual(e.status, 500);
+            assert.deepEqual(e.body.detail, 'Error: Invalid path.');
+        });
+    });
+
     after(function() { return server.stop(); });
 });

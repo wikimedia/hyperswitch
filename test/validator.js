@@ -212,5 +212,29 @@ describe('Validator', function() {
             {name: 'bodyParam', in: 'body'}
         ]);
         validator.validate({});
-    })
+    });
+
+    it('Should list options for enum errors', function() {
+        var validator = new Validator([
+            {
+                name: 'queryParam',
+                in: 'query',
+                type: 'string',
+                enum: [ 'one', 'two', 'three' ],
+                required: 'true'
+            }
+        ]);
+        try {
+            validator.validate({
+                query: {
+                    queryParam: 'four'
+                }
+            });
+            throw new Error('Should throw error');
+        } catch (e) {
+            assert.deepEqual(e.constructor.name, 'HTTPError');
+            assert.deepEqual(e.body.detail, "data.query.queryParam should be equal to " +
+                "one of the allowed values: [one, two, three]");
+        }
+    });
 });

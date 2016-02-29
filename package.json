@@ -34,7 +34,7 @@
     "swagger-router": "^0.4.0",
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
     "json-stable-stringify": "git+https://github.com/wikimedia/json-stable-stringify#master",
-    "ajv": "^3.4.0"
+    "ajv": "^3.7.2"
   },
   "devDependencies": {
     "coveralls": "^2.11.6",

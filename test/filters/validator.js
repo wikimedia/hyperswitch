@@ -225,7 +225,11 @@ describe('Validator filter', function () {
 
     it('Should list options for enum errors', function() {
         try {
-            testValidator([
+            testValidator({
+                query: {
+                    queryParam: 'four'
+                }
+            }, [
                 {
                     name: 'queryParam',
                     in: 'query',
@@ -233,11 +237,7 @@ describe('Validator filter', function () {
                     enum: [ 'one', 'two', 'three' ],
                     required: 'true'
                 }
-            ], {
-                query: {
-                    queryParam: 'four'
-                }
-            });
+            ]);
             throw new Error('Should throw error');
         } catch (e) {
             assert.deepEqual(e.constructor.name, 'HTTPError');

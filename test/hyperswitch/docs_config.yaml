@@ -1,0 +1,28 @@
+spec_root: &spec_root
+  paths:
+    /{api:v1}:
+      x-modules:
+        - type: inline
+          spec:
+            paths:
+              /test:
+                get:
+                  x-request-handler:
+                    - return_result:
+                        return:
+                          status: 200
+                          body: 'test'
+
+# Finally, a standard service-runner config.
+info:
+  name: hyperswitch
+
+services:
+  - name: test_service
+    module: ./lib/server
+    conf:
+      port: 12345
+      spec: *spec_root
+      salt: secret
+      default_page_size: 1
+      user_agent: HyperSwitch-testsuite

@@ -30,7 +30,7 @@
     "js-yaml": "^3.5.2",
     "cassandra-uuid": "^0.0.2",
     "preq": "^0.4.8",
-    "swagger-router": "^0.4.0",
+    "swagger-router": "^0.4.1",
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
     "json-stable-stringify": "git+https://github.com/wikimedia/json-stable-stringify#master",
     "ajv": "^3.7.2"

@@ -3,90 +3,103 @@
 // mocha defines to avoid JSHint breakage
 /* global describe, it, before, beforeEach, after, afterEach */
 
-var assert = require('./utils/assert.js');
-var Validator = require('../lib/validator');
+var assert = require('./../utils/assert.js');
+var validator = require('../../lib/filters/validator');
 
-describe('Validator', function() {
+var testValidator = function (req, parameters) {
+    return validator(null, req, function () {
+    }, null, {
+        spec: {
+            parameters: parameters
+        }
+    });
+};
 
-    it('Should validate request for required fields', function() {
-        var validator = new Validator([{
-            name: 'testParam',
-            in: 'formData',
-            required: true
-        }]);
+describe('Validator filter', function () {
+
+    it('Should validate request for required fields', function () {
         try {
-            validator.validate({
+            testValidator({
                 body: {
                     otherParam: 'test'
                 }
-            });
+            }, [{
+                name: 'testParam',
+                in: 'formData',
+                required: true
+            }]);
             throw new Error('Error should be thrown');
-        } catch(e) {
+        } catch (e) {
             assert.deepEqual(e.constructor.name, 'HTTPError');
             assert.deepEqual(e.body.detail, "data.body should have required property 'testParam'");
         }
     });
 
-    it('Should compile validator with no required fields', function() {
-        new Validator([{
+    it('Should compile validator with no required fields', function () {
+        testValidator({
+            body: {}
+        }, [{
             name: 'testParam',
             in: 'formData'
         }]);
     });
 
-    it('Should validate integers', function() {
-        var validator = new Validator([{
-            name: 'testParam',
-            in: 'query',
-            type: 'integer',
-            required: true
-        }]);
+    it('Should validate integers', function () {
         try {
-            validator.validate({
+            testValidator({
                 query: {
                     testParam: 'not_an_integer'
                 }
-            });
+            }, [{
+                name: 'testParam',
+                in: 'query',
+                type: 'integer',
+                required: true
+            }]);
             throw new Error('Error should be thrown');
-        } catch(e) {
+        } catch (e) {
             assert.deepEqual(e.constructor.name, 'HTTPError');
             assert.deepEqual(e.body.detail, 'data.query.testParam should be an integer');
         }
     });
 
-    it('Should validate object schemas', function() {
-        var validator = new Validator([{
-            name: 'testParam',
-            in: 'body',
-            schema: {
-                type: 'object',
-                properties: {
-                    field1: {
-                        type: 'string'
-                    },
-                    field2: {
-                        type: 'string'
-                    }
-                },
-                required: ['field1', 'field2']
-            },
-            required: true
-        }]);
+    it('Should validate object schemas', function () {
         try {
-            validator.validate({
+            testValidator({
                 body: {
                     field1: 'some string'
                 }
-            });
+            }, [{
+                name: 'testParam',
+                in: 'body',
+                schema: {
+                    type: 'object',
+                    properties: {
+                        field1: {
+                            type: 'string'
+                        },
+                        field2: {
+                            type: 'string'
+                        }
+                    },
+                    required: ['field1', 'field2']
+                },
+                required: true
+            }]);
             throw new Error('Error should be thrown');
-        } catch(e) {
+        } catch (e) {
             assert.deepEqual(e.constructor.name, 'HTTPError');
             assert.deepEqual(e.body.detail, "data.body should have required property 'field2'");
         }
     });
 
-    it('Should allow floats in number validator', function() {
-        var validator = new Validator([
+    it('Should allow floats in number validator', function () {
+        testValidator({
+            query: {
+                testParam1: '27.5',
+                testParam2: '27,5'
+            }
+        }, [
             {
                 name: 'testParam1',
                 in: 'query',
@@ -100,23 +113,9 @@ describe('Validator', function() {
                 required: true
             }
         ]);
-        validator.validate({
-            query: {
-                testParam1: '27.5',
-                testParam2: '27,5'
-            }
-        });
     });
 
-    it('Should coerce boolean parameters', function() {
-        var validator = new Validator([
-            { name: 'boolParamTrue', in: 'query', type: 'boolean' },
-            { name: 'boolParamTrueUpperCase', in: 'query', type: 'boolean' },
-            { name: 'boolParamFalse', in: 'query', type: 'boolean' },
-            { name: 'boolParamFalseUpperCase', in: 'query', type: 'boolean' },
-            { name: 'boolParam0', in: 'query', type: 'boolean' },
-            { name: 'boolParam1', in: 'query', type: 'boolean' },
-        ]);
+    it('Should coerce boolean parameters', function () {
         var req = {
             query: {
                 boolParamTrue: 'true',
@@ -127,7 +126,14 @@ describe('Validator', function() {
                 boolParam1: '1'
             }
         };
-        validator.validate(req);
+        testValidator(req, [
+            {name: 'boolParamTrue', in: 'query', type: 'boolean'},
+            {name: 'boolParamTrueUpperCase', in: 'query', type: 'boolean'},
+            {name: 'boolParamFalse', in: 'query', type: 'boolean'},
+            {name: 'boolParamFalseUpperCase', in: 'query', type: 'boolean'},
+            {name: 'boolParam0', in: 'query', type: 'boolean'},
+            {name: 'boolParam1', in: 'query', type: 'boolean'},
+        ]);
         assert.deepEqual(req.query.boolParamTrue, true);
         assert.deepEqual(req.query.boolParamTrueUpperCase, true);
         assert.deepEqual(req.query.boolParamFalse, false);
@@ -136,70 +142,74 @@ describe('Validator', function() {
         assert.deepEqual(req.query.boolParam1, true);
     });
 
-    it('Should not coerce string parameters', function() {
-        var validator = new Validator([
-            { name: 'stringParam', in: 'query', type: 'string' }
-        ]);
+    it('Should not coerce string parameters', function () {
         var req = {
             query: {
                 stringParam: 'true'
             }
         };
-        validator.validate(req);
+        testValidator(req, [
+            {name: 'stringParam', in: 'query', type: 'string'}
+        ]);
         assert.deepEqual(req.query.stringParam, 'true');
     });
 
-    it('Should not coerce formData for application/json', function() {
-        var validator = new Validator([
-            {name: 'bodyParam', in: 'formData', type: 'boolean', required: true}
-        ]);
+    it('Should not coerce formData for application/json', function () {
         try {
             // The type is incorrect, but wouldn't be coerced, so error will be thrown
-            validator.validate({
+            testValidator({
                 headers: {
                     'content-type': 'application/json'
                 },
                 body: {
                     bodyParam: 'true'
                 }
-            });
+            }, [
+                {name: 'bodyParam', in: 'formData', type: 'boolean', required: true}
+            ]);
             throw new Error('Should throw error');
         } catch (e) {
             assert.deepEqual(e.constructor.name, 'HTTPError');
             assert.deepEqual(e.body.detail, "data.body.bodyParam should be boolean");
         }
         // Now all is fine, shouldn't throw an error
-        validator.validate({
+        testValidator({
             headers: {
                 'content-type': 'application/json'
             },
             body: {
                 bodyParam: true
             }
-        });
+        }, [
+            {name: 'bodyParam', in: 'formData', type: 'boolean', required: true}
+        ]);
         // Without 'application/json' coercion should be applied
-        var req = validator.validate({
+        var req = {
             body: {
                 bodyParam: 'true'
             }
-        });
+        };
+        testValidator(req, [
+            {name: 'bodyParam', in: 'formData', type: 'boolean', required: true}
+        ]);
         assert.deepEqual(req.body.bodyParam, true);
     });
 
-    it('Should accept body params without a schema and type', function() {
-        var validator = new Validator([
-            {name: 'bodyParam', in: 'body', required: true}
-        ]);
-        validator.validate({
+    it('Should accept body params without a schema and type', function () {
+        testValidator({
             body: {
                 test: 'test'
             }
-        });
+        }, [
+            {name: 'bodyParam', in: 'body', required: true}
+        ]);
         try {
             // The type is incorrect, but wouldn't be coerced, so error will be thrown
-            validator.validate({
+            testValidator({
                 body: 'This is a string, and body param must be an object'
-            });
+            }, [
+                {name: 'bodyParam', in: 'body', required: true}
+            ]);
             throw new Error('Should throw error');
         } catch (e) {
             assert.deepEqual(e.constructor.name, 'HTTPError');
@@ -207,29 +217,27 @@ describe('Validator', function() {
         }
     });
 
-    it('Should allow non-required body', function() {
-        var validator = new Validator([
+    it('Should allow non-required body', function () {
+        testValidator({}, [
             {name: 'bodyParam', in: 'body'}
         ]);
-        validator.validate({});
     });
 
     it('Should list options for enum errors', function() {
-        var validator = new Validator([
-            {
-                name: 'queryParam',
-                in: 'query',
-                type: 'string',
-                enum: [ 'one', 'two', 'three' ],
-                required: 'true'
-            }
-        ]);
         try {
-            validator.validate({
+            testValidator({
                 query: {
                     queryParam: 'four'
                 }
-            });
+            }, [
+                {
+                    name: 'queryParam',
+                    in: 'query',
+                    type: 'string',
+                    enum: [ 'one', 'two', 'three' ],
+                    required: 'true'
+                }
+            ]);
             throw new Error('Should throw error');
         } catch (e) {
             assert.deepEqual(e.constructor.name, 'HTTPError');

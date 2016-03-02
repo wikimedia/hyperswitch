@@ -184,37 +184,6 @@ describe('HyperSwitch context', function() {
         });
     });
 
-    it('requires salt in the config', function() {
-        try {
-            main({
-                appBasePath: __dirname + '/../../',
-                config: {
-                    port: 12346,
-                    spec: simpleSpec
-                }
-            });
-            throw new Error('Should throw error on invalid salt');
-        } catch (e) {
-            assert.deepEqual(e.message,
-                'Missing or invalid `salt` option in HyperSwitch config. Expected a string.')
-        }
-
-        try {
-            main({
-                appBasePath: __dirname + '/../../',
-                config: {
-                    salt: 1,
-                    port: 12346,
-                    spec: simpleSpec
-                }
-            });
-            throw new Error('Should throw error on invalid salt');
-        } catch (e) {
-            assert.deepEqual(e.message,
-            'Missing or invalid `salt` option in HyperSwitch config. Expected a string.')
-        }
-    });
-
     it('Should strip out hop-to-hop headers', function() {
         return preq.get({
             uri: server.hostPort + '/service/hop_to_hop'

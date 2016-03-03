@@ -73,10 +73,10 @@ describe('HyperSwitch context', function() {
             assert.deepEqual(e.status, 404);
             assert.deepEqual(e.headers['content-type'], 'application/problem+json');
             assert.deepEqual(e.body, {
-                type: 'https://restbase.org/errors/not_found#route',
+                type: 'https://mediawiki.org/wiki/HyperSwitch/errors/not_found#route',
                 title: 'Not found.',
                 method: 'get',
-                uri: '/this_path_does_not_exist/'
+                instance: '/this_path_does_not_exist/'
             });
         });
     });
@@ -88,7 +88,7 @@ describe('HyperSwitch context', function() {
         }, function(e) {
             assert.deepEqual(e.status, 400);
             assert.deepEqual(e.headers['content-type'], 'application/problem+json');
-            assert.deepEqual(e.body.uri, '/service/no_response');
+            assert.deepEqual(e.body.instance, '/service/no_response');
         });
     });
 

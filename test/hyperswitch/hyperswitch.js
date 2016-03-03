@@ -73,7 +73,7 @@ describe('HyperSwitch context', function() {
             assert.deepEqual(e.status, 404);
             assert.deepEqual(e.headers['content-type'], 'application/problem+json');
             assert.deepEqual(e.body, {
-                type: 'https://restbase.org/errors/not_found#route',
+                type: 'https://mediawiki.org/wiki/HyperSwitch/errors/not_found#route',
                 title: 'Not found.',
                 method: 'get',
                 uri: '/this_path_does_not_exist/'

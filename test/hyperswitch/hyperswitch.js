@@ -76,7 +76,7 @@ describe('HyperSwitch context', function() {
                 type: 'https://mediawiki.org/wiki/HyperSwitch/errors/not_found#route',
                 title: 'Not found.',
                 method: 'get',
-                instance: '/this_path_does_not_exist/'
+                uri: '/this_path_does_not_exist/'
             });
         });
     });
@@ -88,7 +88,7 @@ describe('HyperSwitch context', function() {
         }, function(e) {
             assert.deepEqual(e.status, 400);
             assert.deepEqual(e.headers['content-type'], 'application/problem+json');
-            assert.deepEqual(e.body.instance, '/service/no_response');
+            assert.deepEqual(e.body.uri, '/service/no_response');
         });
     });
 

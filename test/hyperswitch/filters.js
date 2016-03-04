@@ -5,6 +5,14 @@ var Server = require('../utils/server.js');
 var preq   = require('preq');
 var P      = require('bluebird');
 
+function range(n) {
+    var a = new Array(n);
+    for (var i = 0; i < n; i++) {
+        a[i] = i;
+    }
+    return a;
+}
+
 describe('Documentation handling', function() {
     var server = new Server('test/hyperswitch/filters_config.yaml');
 
@@ -39,6 +47,36 @@ describe('Documentation handling', function() {
             assert.deepEqual(res.body.toString(), 'From Handler');
         });
     });
+
+    // Rate limits
+    it('Should allow low-volume access', function () {
+        return P.each(range(10), function() {
+            return preq.get({
+                uri: server.hostPort + '/limited'
+            })
+            .delay(1200);
+        });
+    });
+
+    // Disabled until the rate limiter actually throws.
+    //
+    // it('Should block high-volume access', function () {
+    //     var limited = 0;
+    //     return P.each(range(30), function() {
+    //         return preq.get({
+    //             uri: server.hostPort + '/limited'
+    //         })
+    //         .catch(function() {
+    //             limited++;
+    //         })
+    //         .delay(500);
+    //     }).then(function() {
+    //         if (limited < 1) {
+    //             throw new Error('Should have limited!');
+    //         }
+    //     });
+
+    // });
 
     after(function() { return server.stop(); });
 });

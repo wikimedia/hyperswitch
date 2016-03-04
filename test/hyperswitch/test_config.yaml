@@ -72,15 +72,13 @@ spec_root: &spec_root
     /service/hop_to_hop:
       get:
         x-request-handler:
-          - return_result:
-              return:
-                status: 200
-                headers:
-                  transfer-encoding: chunked
-                  public: GET
-                  content-encoding: gzip
-                body: 'test'
+          - backend:
+              request:
+                uri: https://en.wikipedia.org/wiki/Main_Page
 
+    /service/gzip:
+      x-modules:
+        - path: test/hyperswitch/gzipping_module.js
 
 # Finally, a standard service-runner config.
 info:

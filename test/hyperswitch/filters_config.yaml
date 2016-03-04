@@ -1,0 +1,42 @@
+spec_root: &spec_root
+  title: "The test service spec root"
+  # Some more general RESTBase info
+  paths:
+    /filtered:
+      x-route-filters:
+        - path: test/hyperswitch/test_filter
+      get:
+        x-request-handler:
+          - return_result:
+              return:
+                status: 200
+                body: 'From Handler'
+    /non_filtered:
+      get:
+        x-request-handler:
+          - return_result:
+              return:
+                status: 200
+                body: 'From Handler'
+      post:
+        x-route-filters:
+          - path: ./test/hyperswitch/test_filter.js
+        x-request-handler:
+          - return_result:
+              return:
+                status: 200
+                body: 'From Handler'
+
+
+# Finally, a standard service-runner config.
+info:
+  name: hyperswitch
+
+services:
+  - name: test_service
+    module: ./lib/server
+    conf:
+      port: 12345
+      spec: *spec_root
+      default_page_size: 1
+      user_agent: HyperSwitch-testsuite

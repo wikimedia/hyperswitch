@@ -13,7 +13,7 @@ function range(n) {
     return a;
 }
 
-describe('Documentation handling', function() {
+describe('Filters', function() {
     var server = new Server('test/hyperswitch/filters_config.yaml');
 
     before(function() { return server.start(); });

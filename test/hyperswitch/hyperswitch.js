@@ -190,7 +190,6 @@ describe('HyperSwitch context', function() {
         })
         .then(function(res) {
             assert.deepEqual(res.status, 200);
-            assert.deepEqual(res.headers.hasOwnProperty('transfer-encoding'), false);
             assert.deepEqual(res.headers.hasOwnProperty('public'), false);
             assert.deepEqual(res.headers.hasOwnProperty('content-encoding'), false);
         });
@@ -204,6 +203,31 @@ describe('HyperSwitch context', function() {
             assert.deepEqual(res.status, 200);
             assert.contentType(res, 'application/json');
             assert.deepEqual(res.body.swagger, '2.0');
+        });
+    });
+
+    it('Should not gzip already gzipped content', function() {
+        return preq.get({
+            uri: server.hostPort + '/service/gzip/get'
+        })
+        .then(function(res) {
+            assert.deepEqual(res.status, 200);
+            assert.deepEqual(res.body.toString(), 'TEST');
+        });
+    });
+
+    it('Should unzip content if it is not accepted', function() {
+        return preq.get({
+            uri: server.hostPort + '/service/gzip/get',
+            headers: {
+                'accept-encoding': 'identity'
+            },
+            gzip: false
+        })
+        .then(function(res) {
+            assert.deepEqual(res.status, 200);
+            assert.deepEqual(res.headers.hasOwnProperty('content-encoding'), false);
+            assert.deepEqual(res.body.toString(), 'TEST');
         });
     });
 

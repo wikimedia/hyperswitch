@@ -208,7 +208,7 @@ describe('HyperSwitch context', function() {
 
     it('Should not gzip already gzipped content', function() {
         return preq.get({
-            uri: server.hostPort + '/service/gzip/get'
+            uri: server.hostPort + '/service/module/gzip'
         })
         .then(function(res) {
             assert.deepEqual(res.status, 200);
@@ -218,7 +218,7 @@ describe('HyperSwitch context', function() {
 
     it('Should unzip content if it is not accepted', function() {
         return preq.get({
-            uri: server.hostPort + '/service/gzip/get',
+            uri: server.hostPort + '/service/module/gzip',
             headers: {
                 'accept-encoding': 'identity'
             },
@@ -228,6 +228,15 @@ describe('HyperSwitch context', function() {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.headers.hasOwnProperty('content-encoding'), false);
             assert.deepEqual(res.body.toString(), 'TEST');
+        });
+    });
+
+    it('Should get remote content with URI', function() {
+        return preq.get({
+            uri: server.hostPort + '/service/module/remote'
+        })
+        .then(function(res) {
+            assert.deepEqual(res.status, 200);
         });
     });
 

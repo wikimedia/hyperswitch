@@ -76,9 +76,9 @@ spec_root: &spec_root
               request:
                 uri: https://en.wikipedia.org/wiki/Main_Page
 
-    /service/gzip:
+    /service/module:
       x-modules:
-        - path: test/hyperswitch/gzipping_module.js
+        - path: test/hyperswitch/js_module.js
 
 # Finally, a standard service-runner config.
 info:

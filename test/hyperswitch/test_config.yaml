@@ -1,5 +1,8 @@
 spec_root: &spec_root
   title: "The test service spec root"
+  x-sub-request-filters:
+    - type: default
+      name: http
   # Some more general RESTBase info
   paths:
     /service/recursive/{title}:

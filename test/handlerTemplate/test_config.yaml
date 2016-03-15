@@ -1,4 +1,7 @@
 spec_root: &spec_root
+  x-sub-request-filters:
+    - type: default
+      name: http
   title: "The test service spec root"
   # Some more general RESTBase info
   paths:

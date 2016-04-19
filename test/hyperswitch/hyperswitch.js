@@ -3,6 +3,7 @@
 var assert = require('../utils/assert.js');
 var Server = require('../utils/server.js');
 var preq   = require('preq');
+var nock   = require('nock');
 
 var main = require('../../lib/server');
 
@@ -237,6 +238,28 @@ describe('HyperSwitch context', function() {
         })
         .then(function(res) {
             assert.deepEqual(res.status, 200);
+        });
+    });
+
+    it('Should pass User-Agent header', function() {
+        var api = nock('https://en.wikipedia.org', {
+            reqheaders: {
+                'user-agent': 'test_user_agent'
+            }
+        })
+        .get('/wiki/Main_Page').reply(200, {});
+
+        return preq.get({
+            uri: server.hostPort + '/service/hop_to_hop',
+            headers: {
+                'user-agent': 'test_user_agent'
+            }
+        })
+        .then(function() {
+            api.done();
+        })
+        .finally(function() {
+            nock.cleanAll();
         });
     });
 

@@ -12,6 +12,19 @@ spec_root: &spec_root
                         return:
                           status: 200
                           body: 'test'
+    /{api:sys}/test/:
+      x-modules:
+        - type: inline
+          spec:
+            paths:
+              /test:
+                get:
+                  x-request-handler:
+                    - return_result:
+                        return:
+                          status: 200
+                          body: 'test'
+
 
 # Finally, a standard service-runner config.
 info:

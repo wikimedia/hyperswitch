@@ -7,7 +7,6 @@ var Router = require('../../lib/router');
 var assert = require('../utils/assert');
 var fs     = require('fs');
 var yaml   = require('js-yaml');
-var URI    = require('swagger-router').URI;
 
 var fakeHyperSwitch = { config: {} };
 
@@ -270,7 +269,7 @@ describe('Router', function() {
                 try {
                     var expectedRequest = {
                         method: 'post',
-                        uri: new URI('/testing/uri/that/will/be/checked/by/test'),
+                        uri: '/testing/uri/that/will/be/checked/by/test',
                         headers: {
                             test: 'test'
                         },

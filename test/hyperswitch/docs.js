@@ -113,5 +113,30 @@ describe('Documentation handling', function() {
         });
     });
 
+    it('should not list sys api', function () {
+        return preq.get({
+            uri: server.hostPort + '/'
+        })
+        .then(function(res) {
+            assert.deepEqual(res.body, {
+                items: [ 'v1' ]
+            });
+        });
+    });
+
+    it('should not allow doc requests to sys', function () {
+        return preq.get({
+            uri: server.hostPort + '/sys/?doc=',
+            headers: {
+                accept: 'text/html'
+            }
+        })
+        .then(function() {
+            throw new Error('Error should be thrown');
+        }, function (e) {
+            assert.deepEqual(e.status, 403);
+        });
+    });
+
     after(function() { return server.stop(); });
 });

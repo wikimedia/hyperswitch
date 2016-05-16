@@ -3,6 +3,14 @@ spec_root: &spec_root
   x-sub-request-filters:
     - type: default
       name: http
+      options:
+        allow:
+          - pattern: /^https?:\/\/en.wikipedia.org\//
+            forward_headers:
+              user-agent: true
+          - pattern: /^https?:\/\/trusted.service\//
+            forward_headers: true
+          - pattern: /^https?:\/\//
   # Some more general RESTBase info
   paths:
     /service/recursive/{title}:
@@ -72,12 +80,12 @@ spec_root: &spec_root
                   result: '{$.request.body.field}'
         x-monitor: false
 
-    /service/hop_to_hop:
+    /service/hop_to_hop/{domain}:
       get:
         x-request-handler:
           - backend:
               request:
-                uri: https://en.wikipedia.org/wiki/Main_Page
+                uri: https://{domain}/wiki/Main_Page
 
     /service/module:
       x-modules:

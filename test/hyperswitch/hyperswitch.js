@@ -187,7 +187,7 @@ describe('HyperSwitch context', function() {
 
     it('Should strip out hop-to-hop headers', function() {
         return preq.get({
-            uri: server.hostPort + '/service/hop_to_hop'
+            uri: server.hostPort + '/service/hop_to_hop/en.wikipedia.org'
         })
         .then(function(res) {
             assert.deepEqual(res.status, 200);
@@ -241,18 +241,49 @@ describe('HyperSwitch context', function() {
         });
     });
 
-    it('Should pass User-Agent header', function() {
-        var api = nock('https://en.wikipedia.org', {
+    it('Should only pass UA and x-client-ip if header forwarding is `true`', function() {
+        var api = nock('https://trusted.service', {
             reqheaders: {
-                'user-agent': 'test_user_agent'
-            }
+                'user-agent': 'test_user_agent',
+                'x-client-ip': '127.0.0.1',
+            },
+            badheaders: ['cookie', 'x-forwarded-for'],
         })
         .get('/wiki/Main_Page').reply(200, {});
 
         return preq.get({
-            uri: server.hostPort + '/service/hop_to_hop',
+            uri: server.hostPort + '/service/hop_to_hop/trusted.service',
             headers: {
-                'user-agent': 'test_user_agent'
+                'user-agent': 'test_user_agent',
+                'x-client-ip': '127.0.0.1',
+                'x-forwarded-for': 'also secret',
+                cookie: 'very secret',
+            }
+        })
+        .then(function() {
+            api.done();
+        })
+        .finally(function() {
+            nock.cleanAll();
+        });
+    });
+
+    it('Should pass UA, but not other sensitive headers', function() {
+        var api = nock('https://en.wikipedia.org', {
+            reqheaders: {
+                'user-agent': 'test_user_agent',
+            },
+            badheaders: ['x-client-ip', 'cookie', 'x-forwarded-for'],
+        })
+        .get('/wiki/Main_Page').reply(200, {});
+
+        return preq.get({
+            uri: server.hostPort + '/service/hop_to_hop/en.wikipedia.org',
+            headers: {
+                'user-agent': 'test_user_agent',
+                'x-client-ip': 'secret',
+                'x-forwarded-for': 'also secret',
+                cookie: 'very secret',
             }
         })
         .then(function() {

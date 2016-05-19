@@ -25,25 +25,12 @@ Server.prototype.start = function() {
     var self = this;
     self.port = self._config.services[0].conf.port;
     self.hostPort = 'http://localhost:' + self.port;
-    return self._runner.run(self._config)
-    .then(function(servers) {
-        self._servers = servers;
-        return true;
-    });
+    return self._runner.start(self._config);
 };
 
 Server.prototype.stop = function() {
     var self = this;
-    if (self._servers) {
-        return P.each(self._servers, function(server) {
-            return server.close();
-        })
-        .then(function() {
-            self._servers = undefined;
-        });
-    } else {
-        return P.resolve();
-    }
+    return self._runner.stop();
 };
 
 module.exports = Server;

@@ -134,6 +134,19 @@ describe('HyperSwitch context', function() {
         });
     });
 
+    it('is OK with empty POST', function() {
+        return preq.post({
+            uri: server.hostPort + '/service/empty_body',
+            headers: {
+                'content-type': 'application/json'
+            }
+        })
+        .then(function (res) {
+            assert.deepEqual(res.status, 200);
+            assert.deepEqual(res.body, {result: 'value'});
+        });
+    });
+
     var simpleSpec = {
         paths: {
             '/test': {

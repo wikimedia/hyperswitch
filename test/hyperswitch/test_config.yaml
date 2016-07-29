@@ -80,6 +80,18 @@ spec_root: &spec_root
                   result: '{$.request.body.field}'
         x-monitor: false
 
+    /service/empty_body:
+      post:
+        x-request-handler:
+          - get_from_api:
+              return:
+                status: 200
+                headers:
+                  content-type: 'application/json'
+                body:
+                  result: 'value'
+        x-monitor: false
+
     /service/hop_to_hop/{domain}:
       get:
         x-request-handler:

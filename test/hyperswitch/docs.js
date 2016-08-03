@@ -49,7 +49,12 @@ describe('Documentation handling', function() {
     });
 
     it('should retrieve all dependencies of the swagger-ui main page', function() {
-        return preq.get({ uri: server.hostPort + '/v1/' })
+        return preq.get({
+            uri: server.hostPort + '/v1/',
+            headers: {
+                accept: 'text/html'
+            }
+        })
         .then(function(res) {
             var assertions = [];
             var linkRegex = /<link\s[^>]*href=["']([^"']+)["']/g;

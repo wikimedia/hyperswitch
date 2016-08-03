@@ -36,20 +36,25 @@ describe('Documentation handling', function() {
 
     it('should retrieve the swagger-ui main page', function() {
         return preq.get({
-            uri: server.hostPort + '/v1/?doc'
+            uri: server.hostPort + '/v1/',
+            headers: {
+                accept: 'text/html'
+            }
         })
         .then(function(res) {
             assert.deepEqual(res.status, 200);
             assert.contentType(res, 'text/html');
             assert.deepEqual(/<html/.exec(res.body)[0], '<html');
-        })
-            .catch(function (e) {
-                console.log(e);
-            });
+        });
     });
 
     it('should retrieve all dependencies of the swagger-ui main page', function() {
-        return preq.get({ uri: server.hostPort + '/v1/?doc' })
+        return preq.get({
+            uri: server.hostPort + '/v1/',
+            headers: {
+                accept: 'text/html'
+            }
+        })
         .then(function(res) {
             var assertions = [];
             var linkRegex = /<link\s[^>]*href=["']([^"']+)["']/g;
@@ -86,7 +91,7 @@ describe('Documentation handling', function() {
 
     it('should throw error for static serve', function() {
         return preq.get({
-            uri: server.hostPort + '/v1/?doc=&path=/this_is_no_a_path',
+            uri: server.hostPort + '/v1/?path=/this_is_no_a_path',
             headers: {
                 accept: 'text/html'
             }
@@ -100,7 +105,7 @@ describe('Documentation handling', function() {
 
     it('should disallow unsecure relative paths for static serve', function() {
         return preq.get({
-            uri: server.hostPort + '/v1/?doc=&path=../../../Test',
+            uri: server.hostPort + '/v1/?path=../../../Test',
             headers: {
                 accept: 'text/html'
             }
@@ -126,7 +131,7 @@ describe('Documentation handling', function() {
 
     it('should not allow doc requests to sys', function () {
         return preq.get({
-            uri: server.hostPort + '/sys/?doc=',
+            uri: server.hostPort + '/sys/',
             headers: {
                 accept: 'text/html'
             }

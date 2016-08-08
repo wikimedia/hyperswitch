@@ -48,6 +48,19 @@ describe('Documentation handling', function() {
         });
     });
 
+    it('should not retrieve the swagger-ui main page further down the hierarchy', function() {
+        return preq.get({
+            uri: server.hostPort + '/v1/test/',
+            headers: {
+                accept: 'text/html'
+            }
+        })
+        .then(function(res) {
+            assert.deepEqual(res.status, 200);
+            assert.contentType(res, 'application/json');
+        });
+    });
+
     it('should retrieve all dependencies of the swagger-ui main page', function() {
         return preq.get({
             uri: server.hostPort + '/v1/',

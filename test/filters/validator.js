@@ -66,6 +66,9 @@ describe('Validator filter', function () {
     it('Should validate object schemas', function () {
         try {
             testValidator({
+                headers: {
+                    'content-type': 'application/json'
+                },
                 body: {
                     field1: 'some string'
                 }
@@ -197,6 +200,9 @@ describe('Validator filter', function () {
 
     it('Should accept body params without a schema and type', function () {
         testValidator({
+            headers: {
+                'content-type': 'application/json'
+            },
             body: {
                 test: 'test'
             }
@@ -215,6 +221,20 @@ describe('Validator filter', function () {
             assert.deepEqual(e.constructor.name, 'HTTPError');
             assert.deepEqual(e.body.detail, "data.body should be object");
         }
+    });
+
+    it('Should coerce body-params for formData', function () {
+        assert.deepEqual(testValidator({
+            body: {
+                test: JSON.stringify({test: "test"})
+            }
+        }, [
+            {name: 'bodyParam', in: 'body', required: true}
+        ], {
+            body: {
+                test: {test: "test"}
+            }
+        }));
     });
 
     it('Should allow non-required body', function () {

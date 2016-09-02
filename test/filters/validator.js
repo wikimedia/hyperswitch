@@ -6,8 +6,11 @@
 var assert = require('./../utils/assert.js');
 var validator = require('../../lib/filters/validator');
 
-var testValidator = function (req, parameters) {
-    return validator(null, req, function () {
+var testValidator = function (req, parameters, example) {
+    return validator(null, req, function (hyper, req) {
+        if (example) {
+            assert.deepEqual(req, example);
+        }
     }, null, {
         spec: {
             parameters: parameters
@@ -223,18 +226,36 @@ describe('Validator filter', function () {
         }
     });
 
-    it('Should coerce body-params for formData', function () {
-        assert.deepEqual(testValidator({
+    it('Should coerce body-params for formData with schema', function () {
+        testValidator({
             body: {
-                test: JSON.stringify({test: "test"})
+                test: JSON.stringify({test: "test"}),
+                bool: 'true',
+                string: 'string'
             }
         }, [
-            {name: 'bodyParam', in: 'body', required: true}
+            {name: 'bodyParam', in: 'body', required: true, schema: {
+                properties: {
+                    test: {
+                        type: 'object'
+                    },
+                    bool: {
+                        type: 'boolean'
+                    },
+                    string: {
+                        type: 'string'
+                    }
+                }
+            }}
         ], {
             body: {
-                test: {test: "test"}
+                test: {
+                    test: "test"
+                },
+                bool: true,
+                string: 'string'
             }
-        }));
+        });
     });
 
     it('Should allow non-required body', function () {

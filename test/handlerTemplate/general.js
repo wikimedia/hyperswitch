@@ -112,7 +112,7 @@ describe('Handler Template', function() {
         .finally(function() { nock.cleanAll(); });
     });
 
-    it('Propagates error on catch mismatch', function() {
+    it('Propagates error on catch mismatch, but ensures JSON error', function() {
         var api = nock('http://mocked_domain_for_tests.com')
         .get('/TestTitle').reply(500, 'SERVER_ERROR', { 'Content-Type': 'text/plain' });
 
@@ -121,7 +121,7 @@ describe('Handler Template', function() {
             throw new Error('Error should be thrown');
         }, function(e) {
             assert.deepEqual(e.status, 500);
-            assert.deepEqual(e.headers['content-type'], 'text/plain');
+            assert.deepEqual(e.headers['content-type'], 'application/problem+json');
         })
         .then(function() { api.done(); })
         .finally(function() { nock.cleanAll(); });

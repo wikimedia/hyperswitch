@@ -160,7 +160,7 @@ describe('Router', function() {
             }
         }, fakeHyperSwitch)
         .then(function() {
-            var node = router.route('/test/api/');
+            var node = router.route(['test', 'api', { type: 'meta', name: 'apiRoot' }]);
             assert.deepEqual(!!node, true);
             assert.deepEqual(!!node.value, true);
             assert.deepEqual(!!node.value.specRoot, true);
@@ -177,7 +177,7 @@ describe('Router', function() {
         var router = new Router({ appBasePath: __dirname });
         return router.loadSpec(yaml.safeLoad(fs.readFileSync(__dirname + '/root_api_spec.yaml')), fakeHyperSwitch)
         .then(function() {
-            var node = router.route('/');
+            var node = router.route([{ type: 'meta', name: 'apiRoot' }]);
             assert.deepEqual(!!node, true);
             assert.deepEqual(!!node.value, true);
             assert.deepEqual(!!node.value.specRoot, true);

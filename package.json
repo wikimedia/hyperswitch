@@ -31,7 +31,7 @@
     "preq": "^0.4.8",
     "swagger-router": "^0.5.5",
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
-    "json-stable-stringify": "git+https://github.com/wikimedia/json-stable-stringify#master",
+    "json-stable-stringify": "^1.0.1",
     "ajv": "^3.7.2",
     "regexp-utils": "^0.3.2"
   },

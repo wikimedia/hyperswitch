@@ -1,6 +1,6 @@
 {
   "name": "hyperswitch",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "REST API creation framework",
   "main": "index.js",
   "scripts": {

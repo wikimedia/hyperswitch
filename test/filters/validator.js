@@ -6,7 +6,7 @@
 var assert = require('./../utils/assert.js');
 var validator = require('../../lib/filters/validator');
 
-var testValidator = function (req, parameters, example) {
+var testValidator = function (req, parameters, example, definitions) {
     return validator(null, req, function (hyper, req) {
         if (example) {
             assert.deepEqual(req, example);
@@ -14,6 +14,9 @@ var testValidator = function (req, parameters, example) {
     }, null, {
         spec: {
             parameters: parameters
+        },
+        specRoot: {
+            definitions: definitions
         }
     });
 };
@@ -285,5 +288,36 @@ describe('Validator filter', function () {
             assert.deepEqual(e.body.detail, "data.query.queryParam should be equal to " +
                 "one of the allowed values: [one, two, three]");
         }
+    });
+
+    it('Should support refs to definitions for parameters', () => {
+        testValidator({
+            body: {
+                test_value: 'four',
+                int_test_value: 4
+            }
+        }, [
+            {
+                name: 'bodyParam',
+                in: 'body',
+                type: 'object',
+                schema: {
+                    $ref: '#/definitions/test_schema'
+                },
+                required: 'true'
+            }
+        ], undefined, {
+            test_schema: {
+                type: 'object',
+                parameters: {
+                    test_value: {
+                        type: 'string'
+                    },
+                    int_test_value: {
+                        type: 'integer'
+                    }
+                }
+            }
+        });
     });
 });

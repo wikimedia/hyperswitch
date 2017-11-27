@@ -254,7 +254,7 @@ describe('Router', function() {
 
     it('calls resources when module is created', function(done) {
         var router = new Router({ appBasePath: __dirname });
-        return router.loadSpec({
+        router.loadSpec({
             paths: {
                 '/test': {
                     'x-modules': [

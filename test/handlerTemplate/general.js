@@ -117,7 +117,7 @@ describe('Handler Template',() => {
             uri: server.hostPort + '/service/return_if_test/TestTitle',
             retries: 0
         })
-        .then(function () {
+        .then( () => {
             throw new Error('Error should be thrown');
         }, (e) => {
             assert.deepEqual(e.status, 500);

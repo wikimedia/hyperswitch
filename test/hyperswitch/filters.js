@@ -13,42 +13,42 @@ function range(n) {
     return a;
 }
 
-describe('Filters', function() {
+describe('Filters',() => {
     var server = new Server('test/hyperswitch/filters_config.yaml');
 
-    before(function() { return server.start(); });
+    before(() => { return server.start(); });
 
-    it('should pick filters from path spec', function() {
+    it('should pick filters from path spec', () => {
         return preq.get({
             uri: server.hostPort + '/filtered'
         })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body.toString(), 'From Filter');
         });
     });
 
-    it('should pick filters from method spec', function() {
+    it('should pick filters from method spec', () => {
         return preq.post({
             uri: server.hostPort + '/non_filtered'
         })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body.toString(), 'From Filter');
         });
     });
 
-    it('should not apply filter to different method', function() {
+    it('should not apply filter to different method', () => {
         return preq.get({
             uri: server.hostPort + '/non_filtered'
         })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body.toString(), 'From Handler');
         });
     });
 
-    it('should allow access if headers matched', function() {
+    it('should allow access if headers matched', () => {
         return preq.get({
             uri: server.hostPort + '/header_match_filter',
             headers: {
@@ -57,13 +57,13 @@ describe('Filters', function() {
                 header_three: 'some_random_value'
             }
         })
-        .then(function(res) {
+        .then((res)  => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body.toString(), 'From Handler');
         });
     });
 
-    it('should restrict access if headers not matched', function() {
+    it('should restrict access if headers not matched', () => {
         return preq.get({
             uri: server.hostPort + '/header_match_filter',
             headers: {
@@ -71,17 +71,17 @@ describe('Filters', function() {
                 header_three: 'some_random_value'
             }
         })
-        .then(function() {
+        .then(() => {
             throw new Error('Error should be thrown');
-        }, function(e) {
+        }, (e) => {
             assert.deepEqual(e.status, 403);
             assert.deepEqual(e.body.detail, 'Test Message');
         });
     });
 
     // Rate limits
-    it('Should allow low-volume access', function () {
-        return P.each(range(10), function() {
+    it('Should allow low-volume access', () => {
+        return P.each(range(10), () => {
             return preq.get({
                 uri: server.hostPort + '/limited'
             })
@@ -91,17 +91,17 @@ describe('Filters', function() {
 
     // Disabled until the rate limiter actually throws.
     //
-    // it('Should block high-volume access', function () {
+    // it('Should block high-volume access',  () => {
     //     var limited = 0;
-    //     return P.each(range(30), function() {
+    //     return P.each(range(30), () => {
     //         return preq.get({
     //             uri: server.hostPort + '/limited'
     //         })
-    //         .catch(function() {
+    //         .catch(() => {
     //             limited++;
     //         })
     //         .delay(500);
-    //     }).then(function() {
+    //     }).then(() => {
     //         if (limited < 1) {
     //             throw new Error('Should have limited!');
     //         }
@@ -109,5 +109,5 @@ describe('Filters', function() {
 
     // });
 
-    after(function() { return server.stop(); });
+    after(() => { return server.stop(); });
 });

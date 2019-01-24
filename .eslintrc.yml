@@ -1,1 +1,42 @@
-extends: 'node-services'
+extends:
+ - 'wikimedia/server'
+
+plugins:
+ - json
+ - jsdoc
+
+rules:
+ # same as eslint-config-node-services
+ array-bracket-spacing:
+   - off
+ # same as eslint-config-node-services   
+ camelcase:
+   - error
+   - properties: never
+ # same as eslint-config-node-services
+ computed-property-spacing:
+   - error
+   - never
+ # same as eslint-config-node-services  
+ indent:
+   - error
+   - 4
+   - SwitchCase: 1
+     MemberExpression: 'off'
+ # same as eslint-config-node-services
+ no-multi-spaces:
+   - off
+ # defined in eslint-config-wikimedia to avoid breaking IE. Not needed here
+ no-restricted-syntax:
+   - off   
+ # same as eslint-config-node-services
+ no-underscore-dangle:
+   - off
+ # same as eslint-config-node-services
+ no-unused-vars:
+   - error
+   - args: none
+ # same as eslint-config-node-services
+ space-in-parens:
+   - error
+   - never

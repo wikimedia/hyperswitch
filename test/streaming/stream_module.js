@@ -18,7 +18,7 @@ function buffer(hyper, req) {
     var body = new stream.PassThrough();
     body.write(new Buffer('hel'));
     // Delay the final write to test async production.
-    setTimeout(function() {
+    setTimeout(() => {
         body.end(new Buffer('lo'));
     }, 500);
 
@@ -46,7 +46,7 @@ function chunks(hyper, req) {
     };
 }
 
-module.exports = function(options) {
+module.exports = (options) => {
     return {
         spec: {
             paths: {

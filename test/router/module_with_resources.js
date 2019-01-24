@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function() {
+module.exports =() => {
     return {
         spec: {
             paths: {
@@ -10,7 +10,7 @@ module.exports = function() {
             }
         },
         operations: {
-            operation: function() {}
+            operation:() => {}
         },
         resources: [
             {

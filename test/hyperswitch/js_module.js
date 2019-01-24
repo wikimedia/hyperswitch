@@ -4,7 +4,7 @@ var P = require('bluebird');
 var zlib = require('zlib');
 var URI = require('../../lib/exports').URI;
 
-module.exports = function() {
+module.exports =() => {
     return {
         spec: {
             paths: {
@@ -21,7 +21,7 @@ module.exports = function() {
             }
         },
         operations: {
-            gzipContent: function() {
+            gzipContent:() => {
                 var zStream = zlib.createGzip({ level: 5 });
                 zStream.end('TEST');
                 return P.resolve({
@@ -32,7 +32,7 @@ module.exports = function() {
                     body: zStream
                 });
             },
-            remoteContent: function(hyper) {
+            remoteContent: (hyper) => {
                 return hyper.get({
                     uri: new URI('https://en.wikipedia.org/wiki/Darth_Vader')
                 });

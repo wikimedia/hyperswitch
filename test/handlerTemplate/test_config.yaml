@@ -36,6 +36,7 @@ spec_root: &spec_root
           - get_from_api:
               request:
                 uri: http://mocked_domain_for_tests.com/{title}
+                retries: 0
               return_if:
                 status: '2xx'
               catch:

@@ -116,7 +116,10 @@ describe('Handler Template', function() {
         var api = nock('http://mocked_domain_for_tests.com')
         .get('/TestTitle').reply(500, 'SERVER_ERROR', { 'Content-Type': 'text/plain' });
 
-        return preq.get({ uri: server.hostPort + '/service/return_if_test/TestTitle' })
+        return preq.get({
+            uri: server.hostPort + '/service/return_if_test/TestTitle',
+            retries: 0
+        })
         .then(function () {
             throw new Error('Error should be thrown');
         }, function(e) {

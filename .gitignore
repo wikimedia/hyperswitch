@@ -5,6 +5,9 @@ npm-debug.log
 # WebStorm IDE files
 .idea/*
 *.iml
+# Visual Studio Code files
+.vscode/
 
 # vim temp files
 *swp
+

@@ -5,13 +5,10 @@ var Server = require('../utils/server.js');
 var preq   = require('preq');
 var nock   = require('nock');
 
-// mocha defines to avoid JSHint breakage
-/* global describe, it, before, beforeEach, after, afterEach */
-
-describe('Handler Template', function() {
+describe('Handler Template',() => {
     var server;
 
-    it('Runs the setup handler', function() {
+    it('Runs the setup handler',() => {
         var api = nock('http://mocked_domain_for_tests.com', {
             reqheaders: {
                 test: 'test_value'
@@ -21,11 +18,11 @@ describe('Handler Template', function() {
 
         server = new Server('test/handlerTemplate/test_config.yaml');
         return server.start()
-        .then(function() { api.done(); })
-        .finally(function() { nock.cleanAll(); });
+        .then(() => { api.done(); })
+        .finally(() => { nock.cleanAll(); });
     });
 
-    it('Retrieve content from backend service', function () {
+    it('Retrieve content from backend service', () => {
         var mockReply = '<html><head><title>1</title></head><body></body></html>';
         var api = nock('http://mocked_domain_for_tests.com')
         .get('/TestTitle').reply(200, mockReply, { 'Content-Type': 'text/html' });
@@ -36,11 +33,11 @@ describe('Handler Template', function() {
             assert.deepEqual(res.headers['content-type'], 'text/html');
             assert.deepEqual(res.body, mockReply);
         })
-        .then(function() { api.done(); })
-        .finally(function() { nock.cleanAll(); });
+        .then(() => { api.done(); })
+        .finally(() => { nock.cleanAll(); });
     });
 
-    it('Retrieve content from backend service in parallel', function () {
+    it('Retrieve content from backend service in parallel', () => {
         var mockReply1 = '<html><head><title>1</title></head><body></body></html>';
         var mockReply2 = '<html><head><title>2</title></head><body></body></html>';
         var api = nock('http://mocked_domain_for_tests.com')
@@ -53,11 +50,11 @@ describe('Handler Template', function() {
             assert.deepEqual(res.headers['content-type'], 'application/json');
             assert.deepEqual([res.body.res1, res.body.res2].sort(), [mockReply1, mockReply2]);
         })
-        .then(function() { api.done(); })
-        .finally(function() { nock.cleanAll(); });
+        .then(() => { api.done(); })
+        .finally(() => { nock.cleanAll(); });
     });
 
-    it('Returns response on return_if match', function() {
+    it('Returns response on return_if match', () => {
         var mockReply = '<html><head><title>1</title></head><body></body></html>';
         var api = nock('http://mocked_domain_for_tests.com')
         .get('/TestTitle').reply(200, mockReply, { 'Content-Type': 'text/html' });
@@ -68,11 +65,11 @@ describe('Handler Template', function() {
             assert.deepEqual(res.headers['content-type'], 'text/html');
             assert.deepEqual(res.body, mockReply);
         })
-        .then(function() { api.done(); })
-        .finally(function() { nock.cleanAll(); });
+        .then(() => { api.done(); })
+        .finally(() => { nock.cleanAll(); });
     });
 
-    it('Follows a chain on simple catch match', function() {
+    it('Follows a chain on simple catch match', () => {
         var mockReply = '<html><head><title>1</title></head><body></body></html>';
         var api = nock('http://mocked_domain_for_tests.com')
         .get('/TestTitle').reply(404, 'NOT FOUND', { 'Content-Type': 'text/plain' })
@@ -84,11 +81,11 @@ describe('Handler Template', function() {
             assert.deepEqual(res.headers['content-type'], 'text/html');
             assert.deepEqual(res.body, mockReply);
         })
-        .then(function() { api.done(); })
-        .finally(function() { nock.cleanAll(); });
+        .then(() => { api.done(); })
+        .finally(() => { nock.cleanAll(); });
     });
 
-    it('Follows a chain on array catch match', function() {
+    it('Follows a chain on array catch match', () => {
         var mockReply = '<html><head><title>1</title></head><body></body></html>';
         var api = nock('http://mocked_domain_for_tests.com')
         .get('/TestTitle').reply(404, 'NOT FOUND', { 'Content-Type': 'text/plain' })
@@ -108,11 +105,11 @@ describe('Handler Template', function() {
             assert.deepEqual(res.headers['content-type'], 'text/html');
             assert.deepEqual(res.body, mockReply);
         })
-        .then(function() { api.done(); })
-        .finally(function() { nock.cleanAll(); });
+        .then(() => { api.done(); })
+        .finally(() => { nock.cleanAll(); });
     });
 
-    it('Propagates error on catch mismatch, but ensures JSON error', function() {
+    it('Propagates error on catch mismatch, but ensures JSON error', () => {
         var api = nock('http://mocked_domain_for_tests.com')
         .get('/TestTitle').reply(500, 'SERVER_ERROR', { 'Content-Type': 'text/plain' });
 
@@ -120,28 +117,28 @@ describe('Handler Template', function() {
             uri: server.hostPort + '/service/return_if_test/TestTitle',
             retries: 0
         })
-        .then(function () {
+        .then( () => {
             throw new Error('Error should be thrown');
-        }, function(e) {
+        }, (e) => {
             assert.deepEqual(e.status, 500);
             assert.deepEqual(e.headers['content-type'], 'application/problem+json');
         })
-        .then(function() { api.done(); })
-        .finally(function() { nock.cleanAll(); });
+        .then(() => { api.done(); })
+        .finally(() => { nock.cleanAll(); });
     });
 
-    it('Supports non-status conditions', function() {
+    it('Supports non-status conditions', () => {
         var api = nock('http://mocked_domain_for_tests.com')
         .get('/TestTitle').reply(200, { test: 'test' }, { 'Content-Type': 'application/json' });
 
         return preq.get({ uri: server.hostPort + '/service/non_status_catch/TestTitle' })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body, { test: 'test'});
         })
-        .then(function() { api.done(); })
-        .finally(function() { nock.cleanAll(); });
+        .then(() => { api.done(); })
+        .finally(() => { nock.cleanAll(); });
     });
 
-    after(function() { return server.stop(); });
+    after(() => { return server.stop(); });
 });

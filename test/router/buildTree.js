@@ -1,7 +1,5 @@
 "use strict";
 
-// mocha defines to avoid JSHint breakage
-/* global describe, it, before, beforeEach, after, afterEach */
 
 var Router = require('../../lib/router');
 var assert = require('../utils/assert');
@@ -78,33 +76,33 @@ var nestedSecuritySpec = {
     }
 };
 
-describe('Router', function() {
+describe('Router',() => {
 
-    it('should allow adding methods to existing paths', function() {
+    it('should allow adding methods to existing paths',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec(additionalMethodSpec, fakeHyperSwitch)
-        .then(function() {
+        .then(() => {
             var handler = router.route('/en.wikipedia.org/v1/page/Foo/html');
             assert.deepEqual(!!handler.value.methods.get, true);
             assert.deepEqual(!!handler.value.methods.post, true);
         });
     });
 
-    it('should error on overlapping methods on the same path', function() {
+    it('should error on overlapping methods on the same path',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec(overlappingMethodSpec, fakeHyperSwitch)
-        .then(function() {
+        .then(() => {
             throw new Error("Should throw an exception!");
         },
-        function(e) {
+        (e) => {
             assert.deepEqual(/^Trying to re-define existing metho/.test(e.message), true);
         });
     });
 
-    it('should pass permission along the path to endpoint', function() {
+    it('should pass permission along the path to endpoint',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec(nestedSecuritySpec, fakeHyperSwitch)
-        .then(function() {
+        .then(() => {
             var handler = router.route('/en.wikipedia.org/v1/page/secure');
             assert.deepEqual(handler.permissions, [
                 { value: 'first' },
@@ -114,29 +112,29 @@ describe('Router', function() {
             ]);
         });
     });
-    it('should fail when no handler found for method', function() {
+    it('should fail when no handler found for method',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec(noHandlerSpec, fakeHyperSwitch)
-        .then(function() {
+        .then(() => {
             throw new Error("Should throw an exception!");
         },
-        function(e) {
+        (e) => {
             assert.deepEqual(e.message,
             'No known handler associated with operationId unknown');
         });
     });
 
-    it('should not modify top-level spec-root', function() {
+    it('should not modify top-level spec-root',() => {
         var spec = yaml.safeLoad(fs.readFileSync(__dirname + '/multi_domain_spec.yaml'));
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec(spec, fakeHyperSwitch)
-        .then(function() {
+        .then(() => {
             var node = router.route('/test2');
             assert.deepEqual(node.value.path, '/test2');
         });
     });
 
-    it('support loading modules from absolute paths', function() {
+    it('support loading modules from absolute paths',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec({
             paths: {
@@ -149,7 +147,7 @@ describe('Router', function() {
         }, fakeHyperSwitch)
     });
 
-    it('supports merging api specs from different modules', function() {
+    it('supports merging api specs from different modules',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec({
             paths: {
@@ -161,7 +159,7 @@ describe('Router', function() {
                 }
             }
         }, fakeHyperSwitch)
-        .then(function() {
+        .then(() => {
             var node = router.route(['test', 'api', { type: 'meta', name: 'apiRoot' }]);
             assert.deepEqual(!!node, true);
             assert.deepEqual(!!node.value, true);
@@ -175,10 +173,10 @@ describe('Router', function() {
         });
     });
 
-    it('supports exposing top-level spec', function() {
+    it('supports exposing top-level spec',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec(yaml.safeLoad(fs.readFileSync(__dirname + '/root_api_spec.yaml')), fakeHyperSwitch)
-        .then(function() {
+        .then(() => {
             var node = router.route([{ type: 'meta', name: 'apiRoot' }]);
             assert.deepEqual(!!node, true);
             assert.deepEqual(!!node.value, true);
@@ -191,28 +189,28 @@ describe('Router', function() {
         });
     });
 
-    it('supports recursive matching with + modifier', function() {
+    it('supports recursive matching with + modifier',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec({
             paths: {
                 '/test/{+rest}': noopResponseHanlder
             }
         }, fakeHyperSwitch)
-        .then(function() {
+        .then(() => {
             var node = router.route('/test/foo/bar/baz');
             assert.deepEqual(!!node, true);
             assert.deepEqual(node.params.rest, 'foo/bar/baz');
         });
     });
 
-    it('supports optional matching', function() {
+    it('supports optional matching',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec({
             paths: {
                 '/test{/rest}': noopResponseHanlder
             }
         }, fakeHyperSwitch)
-        .then(function() {
+        .then(() => {
             var node = router.route('/test/foo');
             assert.deepEqual(!!node, true);
             assert.deepEqual(node.params.rest, 'foo');
@@ -222,14 +220,14 @@ describe('Router', function() {
         });
     });
 
-    it('does not explode on empty spec', function() {
+    it('does not explode on empty spec',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec({
             paths: { }
         }, fakeHyperSwitch);
     });
 
-    it('passes options to modules', function() {
+    it('passes options to modules',() => {
         var router = new Router(ROUTER_OPTS);
         // The error is thrown by options_testing_module in case options are not passed correctly
         return router.loadSpec({
@@ -254,7 +252,7 @@ describe('Router', function() {
         }})
     });
 
-    it('calls resources when module is created', function(done) {
+    it('calls resources when module is created', (done) => {
         var router = new Router(ROUTER_OPTS);
         router.loadSpec({
             paths: {
@@ -267,7 +265,7 @@ describe('Router', function() {
                 }
             }
         }, { config: {},
-            request: function(req) {
+            request: (req) => {
                 try {
                     var expectedRequest = {
                         method: 'post',
@@ -286,7 +284,7 @@ describe('Router', function() {
         })
     });
 
-    it('finds module with in app basePath node_modules', function() {
+    it('finds module with in app basePath node_modules',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec({
             paths: {
@@ -299,12 +297,12 @@ describe('Router', function() {
                 }
             }
         }, { config: {} })
-        .then(function() {
+        .then(() => {
             assert.deepEqual(!!router.route('/test/temp'), true);
         });
     });
 
-    it('throws error if module is not found', function() {
+    it('throws error if module is not found',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec({
             paths: {
@@ -317,15 +315,15 @@ describe('Router', function() {
                 }
             }
         }, { config: {} })
-        .then(function() {
+        .then(() => {
             throw new Error('Error should be thrown');
-        }, function(e) {
+        }, (e) => {
             assert.deepEqual(e.code, 'MODULE_NOT_FOUND');
             assert.deepEqual(e.moduleName, 'not_existing_module.js');
         });
     });
 
-    it('throws error on invalid modules definition', function() {
+    it('throws error on invalid modules definition',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec({
             paths: {
@@ -336,14 +334,14 @@ describe('Router', function() {
                 }
             }
         }, { config: {} })
-        .then(function() {
+        .then(() => {
             throw new Error('Error should be thrown');
-        }, function(e) {
+        }, (e) => {
             assert.deepEqual(/^Invalid modules definition/.test(e.message), true);
         });
     });
 
-    it('supports multiple optional parameters', function() {
+    it('supports multiple optional parameters',() => {
         var router = new Router(ROUTER_OPTS);
         return router.loadSpec({
             paths: {
@@ -361,7 +359,7 @@ describe('Router', function() {
                 }
             }
         }, { config: {} })
-        .then(function() {
+        .then(() => {
             assert.deepEqual(router.route('/test/value1/value2').params,
                 { key1 : 'value1', key2: 'value2' });
         });

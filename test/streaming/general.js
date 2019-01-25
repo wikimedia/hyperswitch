@@ -4,46 +4,43 @@ var assert = require('../utils/assert.js');
 var Server = require('../utils/server.js');
 var preq = require('preq');
 
-// mocha defines to avoid JSHint breakage
-/* global describe, it, before, beforeEach, after, afterEach */
-
-describe('Handler Template', function() {
+describe('Handler Template', () => {
     var server = new Server('test/streaming/test_config.yaml');
-    before(function() { return server.start(); });
+    before(() => { return server.start(); });
 
-    it('Basic streaming', function () {
+    it('Basic streaming',() => {
         return preq.get({ uri: server.hostPort + '/test/hello' })
-        .then(function (res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.headers['content-type'], 'text/html');
             assert.deepEqual(res.body, 'hello');
         });
     });
 
-    it('Buffer streaming', function () {
+    it('Buffer streaming',() => {
         return preq.get({ uri: server.hostPort + '/test/buffer' })
-        .then(function (res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.headers['content-type'], 'text/html');
             assert.deepEqual(res.body, 'hello');
         });
     });
 
-    it('Buffer streaming, no compression', function () {
+    it('Buffer streaming, no compression',() => {
         return preq.get({
             uri: server.hostPort + '/test/buffer',
             gzip: false
         })
-        .then(function (res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.headers['content-type'], 'text/html');
             assert.deepEqual(res.body, 'hello');
         });
     });
 
-    it('Multi-chunk streaming', function () {
+    it('Multi-chunk streaming',() => {
         return preq.get({ uri: server.hostPort + '/test/chunks' })
-        .then(function (res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.headers['content-type'], 'text/html');
             if (!/^0123456.*99$/.test(res.body)) {
@@ -52,5 +49,5 @@ describe('Handler Template', function() {
         });
     });
 
-    after(function() { return server.stop(); });
+    after(() => { return server.stop(); });
 });

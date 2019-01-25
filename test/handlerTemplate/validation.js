@@ -3,10 +3,7 @@
 var handlerTemplate = require('../../lib/handlerTemplate');
 var assert = require('./../utils/assert.js');
 
-// mocha defines to avoid JSHint breakage
-/* global describe, it, before, beforeEach, after, afterEach */
-
-describe('Handler Template Spec Validation', function() {
+describe('Handler Template Spec Validation',() => {
     function testValidation(action, expectedError) {
         var caught;
         try {
@@ -20,8 +17,8 @@ describe('Handler Template Spec Validation', function() {
         }
     }
 
-    it('Checks parallel returning requests', function() {
-        testValidation(function() {
+    it('Checks parallel returning requests',() => {
+        testValidation(() => {
             handlerTemplate.createHandler([{
                 get_one: {
                     request: {
@@ -39,15 +36,15 @@ describe('Handler Template Spec Validation', function() {
         }, /^Invalid spec\. Returning requests cannot be parallel\..*/);
     });
 
-    it('Requires either return or request', function() {
-        testValidation(function() {
+    it('Requires either return or request',() => {
+        testValidation(() => {
             handlerTemplate.createHandler([{
                 get_one: {}
             }]);
         }, /^Invalid spec\. Either request or return must be specified\..*/);
     });
 
-    it('Compiles a valid condition function', function() {
+    it('Compiles a valid condition function',() => {
         handlerTemplate.createHandler([{
             get_one: {
                 request: {
@@ -61,8 +58,8 @@ describe('Handler Template Spec Validation', function() {
         }]);
     });
 
-    it('Requires request for return_if', function() {
-        testValidation(function() {
+    it('Requires request for return_if',() => {
+        testValidation(() => {
             handlerTemplate.createHandler([{
                 get_one: {
                     return_if: {
@@ -74,8 +71,8 @@ describe('Handler Template Spec Validation', function() {
         }, /^Invalid spec\. return_if should have a matching request\..*/);
     });
 
-    it('Requires request for catch', function() {
-        testValidation(function() {
+    it('Requires request for catch',() => {
+        testValidation(() => {
             handlerTemplate.createHandler([{
                 get_one: {
                     catch: {
@@ -87,8 +84,8 @@ describe('Handler Template Spec Validation', function() {
         }, /^Invalid spec\. catch should have a matching request\..*/);
     });
 
-    it('Requires correct catch definition', function() {
-        testValidation(function() {
+    it('Requires correct catch definition',() => {
+        testValidation(() => {
             handlerTemplate.createHandler([{
                 get_one: {
                     request: {
@@ -103,16 +100,16 @@ describe('Handler Template Spec Validation', function() {
         }, /^Invalid catch condition asdf.*/);
     });
 
-    it('Requires spec to be an array', function() {
-        testValidation(function() {
+    it('Requires spec to be an array',() => {
+        testValidation(() => {
             handlerTemplate.createHandler({
                 this_is_illegal: 'very illegal'
             });
         }, /^Invalid spec. It must be an array of request block definitions\..*/);
     });
 
-    it('Requires a return if the last step is parallel', function() {
-        testValidation(function() {
+    it('Requires a return if the last step is parallel',() => {
+        testValidation(() => {
             handlerTemplate.createHandler([{
                 get_one: {
                     request: {

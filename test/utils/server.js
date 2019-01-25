@@ -5,7 +5,7 @@ var fs        = require('fs');
 var yaml      = require('js-yaml');
 var P         = require('bluebird');
 
-var Server = function(configPath) {
+var Server = function (configPath) {
     this._configPath = configPath;
     this._config = this._loadConfig();
     this._config.num_workers = 0;

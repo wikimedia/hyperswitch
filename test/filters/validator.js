@@ -1,12 +1,9 @@
 "use strict";
 
-// mocha defines to avoid JSHint breakage
-/* global describe, it, before, beforeEach, after, afterEach */
-
 var assert = require('./../utils/assert.js');
 var validator = require('../../lib/filters/validator');
 
-var testValidator = function (req, parameters, example, definitions) {
+var testValidator = (req, parameters, example, definitions) => {
     return validator(null, req, function (hyper, req) {
         if (example) {
             assert.deepEqual(req, example);
@@ -267,7 +264,7 @@ describe('Validator filter', function () {
         ]);
     });
 
-    it('Should list options for enum errors', function() {
+    it('Should list options for enum errors',() => {
         try {
             testValidator({
                 query: {

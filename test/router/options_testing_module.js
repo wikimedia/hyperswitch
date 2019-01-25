@@ -2,7 +2,7 @@
 
 var assert = require('../utils/assert');
 
-module.exports = function(options) {
+module.exports = (options) => {
     assert.deepEqual(options.simple_option, 'simple_option_value');
     assert.deepEqual(options.templated_option, 'test_conf_option_value');
     assert.deepEqual(options.templates, { sample_template: '{{should not be expanded}}' });
@@ -16,7 +16,7 @@ module.exports = function(options) {
             }
         },
         operations: {
-            operation: function() {}
+            operation:() => {}
         }
     }
 };

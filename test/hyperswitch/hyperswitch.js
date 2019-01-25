@@ -7,27 +7,25 @@ var nock   = require('nock');
 
 var main = require('../../lib/server');
 
-// mocha defines to avoid JSHint breakage
-/* global describe, it, before, beforeEach, after, afterEach */
 
-describe('HyperSwitch context', function() {
+describe('HyperSwitch context',() => {
     var server = new Server('test/hyperswitch/test_config.yaml');
 
-    before(function() {
+    before(() => {
         return server.start();
     });
 
-    it('Does not allow infinite recursion', function () {
+    it('Does not allow infinite recursion',() => {
         return preq.get({ uri: server.hostPort + '/service/recursive/TestTitle' })
         .then(function () {
             throw new Error('Must not allow infinite recursion')
-        }, function(e) {
+        }, (e) => {
             assert.deepEqual(e.status, 500);
             assert.deepEqual(e.body.title, 'HyperSwitch request recursion depth exceeded.');
         });
     });
 
-    it('Supports head request', function () {
+    it('Supports head request',() => {
         return preq.head({ uri: server.hostPort + '/service/head/TestTitle' })
         .then(function (res) {
             assert.deepEqual(res.status, 200);
@@ -36,26 +34,26 @@ describe('HyperSwitch context', function() {
         });
     });
 
-    it('Automatically hooks validation', function () {
+    it('Automatically hooks validation',() => {
         return preq.get({ uri: server.hostPort + '/service/validation/abcde' })
         .then(function () {
             throw new Error('Should throw a validation error');
-        }, function(e) {
+        }, (e) => {
             assert.deepEqual(e.status, 400);
             assert.deepEqual(e.body.title, 'Invalid parameters');
         });
     });
 
 
-    it('Works fine if validation is passed', function () {
+    it('Works fine if validation is passed',() => {
         return preq.get({ uri: server.hostPort + '/service/validation/1' })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.headers.test, 'test');
         });
     });
 
-    it('Provides API listings', function () {
+    it('Provides API listings',() => {
         return preq.get({ uri: server.hostPort + '/service/' })
         .then(function (res) {
             assert.deepEqual(res.status, 200);
@@ -66,11 +64,11 @@ describe('HyperSwitch context', function() {
         });
     });
 
-    it('Throws 404 when no handler is found', function () {
+    it('Throws 404 when no handler is found',() => {
         return preq.get({ uri: server.hostPort + '/this_path_does_not_exist/' })
         .then(function () {
             throw new Error('404 should be thrown');
-        }, function(e) {
+        }, (e) => {
             assert.deepEqual(e.status, 404);
             assert.deepEqual(e.headers['content-type'], 'application/problem+json');
             assert.deepEqual(e.body, {
@@ -82,18 +80,18 @@ describe('HyperSwitch context', function() {
         });
     });
 
-    it('Throws error when bad response is provided', function () {
+    it('Throws error when bad response is provided',() => {
         return preq.get({ uri: server.hostPort + '/service/no_response' })
         .then(function () {
             throw new Error('400 should be thrown');
-        }, function(e) {
+        }, (e) => {
             assert.deepEqual(e.status, 400);
             assert.deepEqual(e.headers['content-type'], 'application/problem+json');
             assert.deepEqual(e.body.uri, '/service/no_response');
         });
     });
 
-    it('Gzips content and provides correct content-length', function () {
+    it('Gzips content and provides correct content-length',() => {
         return preq.get({
             uri: server.hostPort + '/service/gzip_response',
             headers: {
@@ -106,7 +104,7 @@ describe('HyperSwitch context', function() {
         });
     });
 
-    it('parses JSON content', function() {
+    it('parses JSON content',() => {
         // First try invalid JSON body
         return preq.post({
             uri: server.hostPort + '/service/json_body',
@@ -115,7 +113,7 @@ describe('HyperSwitch context', function() {
             },
             body: '{"field": "wrong'
         })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             // Now try passing a valid json
             return preq.post({
@@ -128,13 +126,13 @@ describe('HyperSwitch context', function() {
                 }
             });
         })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body, { result: 'value' });
         });
     });
 
-    it('is OK with empty POST', function() {
+    it('is OK with empty POST',() => {
         return preq.post({
             uri: server.hostPort + '/service/empty_body',
             headers: {
@@ -166,7 +164,7 @@ describe('HyperSwitch context', function() {
         }
     };
 
-    it('does not explode if no logger and metrics provided', function() {
+    it('does not explode if no logger and metrics provided',() => {
         var options = {
             appBasePath: __dirname + '/../../',
             config: {
@@ -176,61 +174,61 @@ describe('HyperSwitch context', function() {
             }
         };
         return main(options)
-        .then(function(server) {
+        .then((server) => {
             return preq.get({
                 uri: 'http://localhost:12346/test'
             })
-            .then(function(res) {
+            .then((res) => {
                 assert.deepEqual(res.status, 200);
                 assert.deepEqual(res.body, 'TEST');
                 return preq.get({
                     uri: 'http://localhost:12346/not_found'
                 })
-                .then(function() {
+                .then(() => {
                     throw new Error('Error should be thrown');
-                }, function(e) {
+                }, (e) => {
                     assert.deepEqual(e.status, 404);
                 });
             })
-            .finally(function() {
+            .finally(() => {
                 server.close();
             });
         });
     });
 
-    it('Should strip out hop-to-hop headers', function() {
+    it('Should strip out hop-to-hop headers',() => {
         return preq.get({
             uri: server.hostPort + '/service/hop_to_hop/en.wikipedia.org'
         })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.headers.hasOwnProperty('public'), false);
             assert.deepEqual(res.headers.hasOwnProperty('content-encoding'), false);
         });
     });
 
-    it('Should retrieve the if multi-api is not used', function() {
+    it('Should retrieve the if multi-api is not used',() => {
         return preq.get({
             uri: server.hostPort + '/?spec'
         })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.contentType(res, 'application/json');
             assert.deepEqual(res.body.swagger, '2.0');
         });
     });
 
-    it('Should not gzip already gzipped content', function() {
+    it('Should not gzip already gzipped content',() => {
         return preq.get({
             uri: server.hostPort + '/service/module/gzip'
         })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body.toString(), 'TEST');
         });
     });
 
-    it('Should unzip content if it is not accepted', function() {
+    it('Should unzip content if it is not accepted', () => {
         return preq.get({
             uri: server.hostPort + '/service/module/gzip',
             headers: {
@@ -238,23 +236,23 @@ describe('HyperSwitch context', function() {
             },
             gzip: false
         })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.headers.hasOwnProperty('content-encoding'), false);
             assert.deepEqual(res.body.toString(), 'TEST');
         });
     });
 
-    it('Should get remote content with URI', function() {
+    it('Should get remote content with URI', () => {
         return preq.get({
             uri: server.hostPort + '/service/module/remote'
         })
-        .then(function(res) {
+        .then((res) => {
             assert.deepEqual(res.status, 200);
         });
     });
 
-    it('Should only pass UA and x-client-ip if header forwarding is `true`', function() {
+    it('Should only pass UA and x-client-ip if header forwarding is `true`',() => {
         var api = nock('https://trusted.service', {
             reqheaders: {
                 'user-agent': 'test_user_agent',
@@ -273,15 +271,15 @@ describe('HyperSwitch context', function() {
                 cookie: 'very secret',
             }
         })
-        .then(function() {
+        .then(() => {
             api.done();
         })
-        .finally(function() {
+        .finally(() => {
             nock.cleanAll();
         });
     });
 
-    it('Should pass UA, but not other sensitive headers', function() {
+    it('Should pass UA, but not other sensitive headers',() => {
         var api = nock('https://en.wikipedia.org', {
             reqheaders: {
                 'user-agent': 'test_user_agent',
@@ -299,13 +297,13 @@ describe('HyperSwitch context', function() {
                 cookie: 'very secret',
             }
         })
-        .then(function() {
+        .then(() => {
             api.done();
         })
-        .finally(function() {
+        .finally(() => {
             nock.cleanAll();
         });
     });
 
-    after(function() { return server.stop(); });
+    after(() => { return server.stop(); });
 });

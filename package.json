@@ -1,6 +1,6 @@
 {
   "name": "hyperswitch",
-  "version": "0.10.5",
+  "version": "0.11.0",
   "description": "REST API creation framework",
   "main": "index.js",
   "scripts": {
@@ -34,7 +34,7 @@
     "preq": "^0.5.6",
     "regexp-utils": "^0.3.2",
     "swagger-router": "^0.7.2",
-    "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master"
+    "swagger-ui-dist": "^3.22.0"
   },
   "devDependencies": {
     "coveralls": "^3.0.2",

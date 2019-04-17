@@ -4,10 +4,9 @@ paths:
       - spec:
           components:
             schemas:
-              first_parameter:
-                description: First parameter definition
+              first_parameter: a string
           paths:
-            /one:
+            /three:
               get:
                 x-request-handler:
                   - return_nothing:

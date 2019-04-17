@@ -30,7 +30,7 @@ describe('Documentation handling',() => {
         .then((res) => {
             assert.deepEqual(res.status, 200);
             assert.contentType(res, 'application/json');
-            assert.deepEqual(res.body.swagger, '2.0');
+            assert.deepEqual(res.body.openapi, '3.0.1');
         });
     });
 

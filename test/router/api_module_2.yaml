@@ -2,9 +2,10 @@ paths:
   /{api:api}:
     x-modules:
       - spec:
-          definitions:
-            second_parameter:
-              description: Second parameter definition
+          components:
+            schemas:
+              second_parameter:
+                description: Second parameter definition
           paths:
             /two:
               get:

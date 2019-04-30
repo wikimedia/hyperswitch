@@ -37,7 +37,8 @@ spec_root: &spec_root
         parameters:
           - name: number
             in: path
-            type: integer
+            schema:
+              type: integer
             required: true
         x-request-handler:
           - get_from_api:

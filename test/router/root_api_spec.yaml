@@ -1,6 +1,7 @@
-definitions:
-  some_object:
-    description: 'bla bla bla'
+components:
+  schemas:
+    some_object:
+      description: 'bla bla bla'
 paths:
   /test:
     get:

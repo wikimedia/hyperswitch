@@ -165,12 +165,31 @@ describe('Router',() => {
             assert.deepEqual(!!node.value, true);
             assert.deepEqual(!!node.value.specRoot, true);
             var spec = node.value.specRoot;
-            assert.deepEqual(spec.definitions, {
+            assert.deepEqual(spec.components.schemas, {
                 first_parameter: {description: 'First parameter definition'},
                 second_parameter: {description: 'Second parameter definition'}
             });
             assert.deepEqual(Object.keys(spec.paths), ['/one', '/two']);
         });
+    });
+
+    it('should fail when merging schemas with different shapes',() => {
+        var router = new Router(ROUTER_OPTS);
+        return router.loadSpec({
+            paths: {
+                '/test': {
+                    'x-modules': [
+                        { path: 'api_module_1.yaml'},
+                        { path: 'api_module_3.yaml'},
+                    ]
+                }
+            }
+        }, fakeHyperSwitch)
+            .then(() => {
+                throw new Error('Error should be thrown');
+            }, (e) => {
+                assert.deepEqual(/^Only objects of the same 'shape' are supported/.test(e.message), true);
+            });
     });
 
     it('supports exposing top-level spec',() => {
@@ -182,7 +201,7 @@ describe('Router',() => {
             assert.deepEqual(!!node.value, true);
             assert.deepEqual(!!node.value.specRoot, true);
             var spec = node.value.specRoot;
-            assert.deepEqual(spec.definitions, {
+            assert.deepEqual(spec.components.schemas, {
                 some_object: {description: 'bla bla bla'}
             });
             assert.deepEqual(Object.keys(spec.paths), ['/test']);

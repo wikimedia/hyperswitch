@@ -34,6 +34,27 @@ describe('Documentation handling',() => {
         });
     });
 
+    it('should retrieve the spec without skipped items', () => {
+        return preq.get({
+            uri: server.hostPort + '/v1/?spec'
+        })
+        .then((res) => {
+            assert.deepEqual(res.status, 200);
+            assert.contentType(res, 'application/json');
+            assert.deepEqual(res.body.paths.hasOwnProperty('/test/test3'), false);
+        });
+    });
+
+    it('should answer requests for paths skipped in the spec', () => {
+        return preq.get({
+            uri: server.hostPort + '/v1/test/test3'
+        })
+        .then((res) => {
+            assert.deepEqual(res.status, 200);
+            assert.deepEqual(res.body, 'test3');
+        });
+    });
+
     it('should retrieve the swagger-ui main page',() => {
         return preq.get({
             uri: server.hostPort + '/v1/',

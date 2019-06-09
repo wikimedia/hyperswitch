@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run lint && mocha",
     "lint": "eslint --max-warnings 0 --ext .js --ext .json .",
-    "coverage": "istanbul cover _mocha -- -R spec",
+    "coverage": "nyc --reporter=lcov _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
@@ -38,13 +38,13 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.2",
-    "istanbul": "^0.4.5",
+    "eslint-config-wikimedia": "^0.10.0",
+    "eslint-plugin-jsdoc": "^3.9.1",
+    "eslint-plugin-json": "^1.2.1",
     "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0",
     "nock": "^9.2.5",
-    "service-runner": "^2.6.4",
-    "eslint-config-wikimedia": "^0.10.0",
-    "eslint-plugin-jsdoc": "^3.9.1",
-    "eslint-plugin-json": "^1.2.1"
+    "nyc": "^14.1.1",
+    "service-runner": "^2.6.4"
   }
 }

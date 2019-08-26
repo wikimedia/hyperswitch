@@ -16,10 +16,10 @@ function hello(hyper, req) {
 
 function buffer(hyper, req) {
     var body = new stream.PassThrough();
-    body.write(new Buffer('hel'));
+    body.write(Buffer.from('hel'));
     // Delay the final write to test async production.
     setTimeout(() => {
-        body.end(new Buffer('lo'));
+        body.end(Buffer.from('lo'));
     }, 500);
 
     return {

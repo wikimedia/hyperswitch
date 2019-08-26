@@ -1,6 +1,6 @@
 {
   "name": "hyperswitch",
-  "version": "0.12.6",
+  "version": "0.12.7",
   "description": "REST API creation framework",
   "main": "index.js",
   "scripts": {
@@ -25,16 +25,16 @@
   },
   "homepage": "https://github.com/wikimedia/hyperswitch",
   "dependencies": {
-    "ajv": "^6.5.4",
-    "bluebird": "^3.5.2",
-    "busboy": "^0.2.14",
+    "ajv": "^6.10.2",
+    "bluebird": "^3.5.5",
+    "busboy": "^0.3.1",
     "fast-json-stable-stringify": "^2.0.0",
-    "js-yaml": "^3.12.0",
-    "preq": "^0.5.8",
+    "js-yaml": "^3.13.1",
+    "preq": "^0.5.11",
     "regexp-utils": "^0.3.2",
-    "swagger-router": "^0.7.3",
-    "swagger-ui-dist": "^3.22.0",
-    "uuid": "^3.3.2"
+    "swagger-router": "^0.7.4",
+    "swagger-ui-dist": "^3.23.6",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "coveralls": "^3.0.2",

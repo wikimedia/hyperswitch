@@ -30,7 +30,7 @@ describe('HyperSwitch context',() => {
         .then(function (res) {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.headers.test, 'test');
-            assert.deepEqual(res.body, new Buffer(''));
+            assert.deepEqual(res.body, Buffer.from(''));
         });
     });
 
@@ -75,7 +75,9 @@ describe('HyperSwitch context',() => {
                 type: 'https://mediawiki.org/wiki/HyperSwitch/errors/not_found#route',
                 title: 'Not found.',
                 method: 'get',
-                uri: '/this_path_does_not_exist/'
+                uri: '/this_path_does_not_exist/',
+                internalURI: 'http://localhost:12345/this_path_does_not_exist/',
+                internalMethod: 'get'
             });
         });
     });
